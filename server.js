@@ -1,30 +1,22 @@
+// Using Node.js `require()`
 const mongoose = require('mongoose');
 const express = require('express');
-const cookieParse = require('cookie-paser');
+const cookieParser = require('cookie-parser');
 const fs = require('fs');
-const crypto = ;
 
-const app = express();
+const port = 81; 
+const hostname = '143.198.232.14';
 
-let sessions = {};
+// Define the MongoDB connection string
+const mongoDBURL = "mongodb+srv://gbenedith:7sAuBQAmMIiZvuBG@ostaa-data.japycpp.mongodb.net/ostaa?retryWrites=true&w=majority";
 
-function addSession(username) {
-    let sid = Math.floor(Math.random() * 1000000000);
-    let now = Date.now();
-    sessions[username] = {id: sid, time: now};
-}
+mongoose.connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true });
+const db = mongoose.connection;
 
-function removeSessions(username) {
-    let now = Date.now();
-    let usernames = Object.keys(sessions);
-    for (let i = 0; i < usernames.length; i++) {
-        let last = sessions[usernames[i]].time;
-        if (last + 120000 < now) {
-            delete sessions[usernames[i]]
-        }
-    }
-    console.log(sessions);
-}
+db.on('error', console.error.bind(console, 'MongoDB connection error:'));
+db.once('open', () => {
+    console.log("Connected to MongoDB");
+});
 
 // Create a schema for user 
 
@@ -65,7 +57,127 @@ const notificationSchema = new mongoose.Schema({
       default: false, // Whether the user has read the notification or not 
     },
   });
+
+let sessions = {};
+
+function addSession(username) {
+    let sid = Math.floor(Math.random() * 1000000000);
+    let now = Date.now();
+    sessions[username] = {id: sid, time: now};
+    return sid;
+}
+
+function removeSessions(username) {
+    let now = Date.now();
+    let usernames = Object.keys(sessions);
+    for (let i = 0; i < usernames.length; i++) {
+        let last = sessions[usernames[i]].time;
+        if (last + 120000 < now) {
+            delete sessions[usernames[i]]
+        }
+    }
+    console.log(sessions);
+}
+
+setInterval(removeSessions, 5000);
+
+// ------------------------------------------------------------------------------------------------------------
+
+const app = express();
+app.use(cookieParser());
+app.use(express.json());
+
+// Error handling middleware for JSON parsing errors
+app.use((error, req, res, next) => {
+    if (error instanceof SyntaxError) {
+      res.status(400).json({ error: 'Invalid JSON data' });
+    } else {
+      next();
+    }
+  });
+
+function authenticate(req, res, next) {
+    let c = req.cookies;
+    console.log('auth request');
+    // console.log(c);
+    console.log(sessions);
+    if (c != undefined && c.login && c.login.username) {
+        if (sessions[c.login.username] != undefined && sessions[c.login.username].id == c.login.sessionID) {
+            next();
+        } else {
+            res.redirect('/app/index.html');
+        }
+    } else {
+        res.redirect('/app/index.html');
+    }
+    
+}
   
+// ------------------------------------------------------------------------------------------------------------
+app.use('/account/*', authenticate);
+app.get('/account/*', (req, res, next) => { 
+    next();
+});
+app.use(express.static('public_html'))
+
+
+// Serve the Server JS file 
+app.get('/server.js', (req, res) => {
+    res.sendFile(__dirname + '/server.js');
+});
+
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public_html/app/index.html');
+});
+
+// Serve the Index JS file
+app.get('/public_html/app/index.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/app/index.js');
+});
+
+// Serve the Index HTML file
+app.get('/app/index.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/app/index.html');
+});
+
+// Serve the Index CSS file
+app.get('/public_html/app/index.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/app/index.css');
+});
+
+// Serve the Home JS file
+app.get('/public_html/account/home.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/home.js');
+});
+
+// Serve the Home HTML file
+app.get('/public_html/account/home.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/home.html');
+});
+
+// Serve the Home CSS file
+app.get('/public_html/account/home.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/home.css');
+});
+
+// Serve the Post JS file
+app.get('/public_html/account/post.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/post.js');
+});
+
+// Serve the Post HTML file
+app.get('/public_html/account/post.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/post.html');
+});
+
+// Serve the Post CSS file
+app.get('/public_html/account/post.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/post.css');
+});
+
+// ------------------------------------------------------------------------------------------------------------
+
+
 
 app.post('account/login', (req, res) => {
     let u = req.body;
@@ -125,26 +237,3 @@ app.get('/account/create/:user/:pass', (req, res) => {
 
 setinterval(removeSessions, 5000);
 
-const app2 = express();
-app2.use(cookieParser());
-
-function authenticate(req, res, next) {
-    let c = req.cookies;
-    console.log('auth request');
-    console.log(c);
-    console.log(sessions);
-    if (c != undefined) {
-        if (sessions[c.login.username] != undefined &&
-            sessions[c.login.username].id == c.login.sessionID) {
-                next();
-        } else {
-            res.redirect('/account/index.html');
-        }
-    } else {
-        res.redirect('/account/index.html');
-    }
-    
-}
-
-app.use('/app/*', authenticate);
-app.use(express.static('public_html'));
