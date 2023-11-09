@@ -237,26 +237,3 @@ app.get('/account/create/:user/:pass', (req, res) => {
 
 setinterval(removeSessions, 5000);
 
-const app2 = express();
-app2.use(cookieParser());
-
-function authenticate(req, res, next) {
-    let c = req.cookies;
-    console.log('auth request');
-    console.log(c);
-    console.log(sessions);
-    if (c != undefined) {
-        if (sessions[c.login.username] != undefined &&
-            sessions[c.login.username].id == c.login.sessionID) {
-                next();
-        } else {
-            res.redirect('/account/index.html');
-        }
-    } else {
-        res.redirect('/account/index.html');
-    }
-    
-}
-
-app.use('/app/*', authenticate);
-app.use(express.static('public_html'));
