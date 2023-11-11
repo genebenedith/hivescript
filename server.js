@@ -4,11 +4,11 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 
-const port = 81; 
-const hostname = '143.198.232.14';
+const port = 80; 
+const hostname = 'localhost'; // For now 
 
 // Define the MongoDB connection string
-const mongoDBURL = "mongodb+srv://gbenedith:7sAuBQAmMIiZvuBG@ostaa-data.japycpp.mongodb.net/ostaa?retryWrites=true&w=majority";
+const mongoDBURL = "mongodb+srv://gbenedith:k0HWPrO07X9Cki1l@hivescript.owmolsx.mongodb.net/hivescript?retryWrites=true&w=majority";
 
 mongoose.connect(mongoDBURL, { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
@@ -17,8 +17,6 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
     console.log("Connected to MongoDB");
 });
-
-// Create a schema for user 
 
 // User Schema 
 const userSchema = new mongoose.Schema({
@@ -57,6 +55,13 @@ const notificationSchema = new mongoose.Schema({
       default: false, // Whether the user has read the notification or not 
     },
   });
+
+// User Schema 
+const projectSchema = new mongoose.Schema({
+    owner: String,
+    urlPath: String,
+    invitees: Array
+});
 
 let sessions = {};
 
