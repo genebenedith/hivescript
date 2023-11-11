@@ -17,7 +17,7 @@ function createUser(event) {
         password: password
     }
 
-    let add = fetch('/user/create', {
+    let add = fetch('/register', {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {"Content-Type": "application/json"}
@@ -25,7 +25,7 @@ function createUser(event) {
     add.then((response) => {
         if (response.status === 200) {
             console.log("Account successfully created.");
-            window.location.href = '/account/home.html';
+            // window.location.href = '/public_html/account/homepage/home.html';
         } else if (response.status === 500) {
             alert("Issue creating account.");
         } else if (response.status === 400) {
@@ -55,7 +55,7 @@ function login(event) {
         password: password
     };
     
-    let auth = fetch('/user/login/', {
+    let auth = fetch('/login', {
         method: 'POST',
         body: JSON.stringify(userData),
         headers: {"Content-Type": "application/json"}
@@ -64,7 +64,7 @@ function login(event) {
     auth.then((response) => {
         if (response.status === 200) {
             console.log("User successfully authenticated.");
-            window.location.href = '/account/home.html';
+            window.location.href = '../account/homepage/home.html';
         } else if (response.status === 500) {
             alert("Issue authenticating user.");
         } else if (response.status === 400) {

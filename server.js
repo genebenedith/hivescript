@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const express = require('express');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
+const crypto = require('crypto');
 
 const port = 80; 
 const hostname = 'localhost'; // For now 
@@ -31,6 +32,8 @@ const userSchema = new mongoose.Schema({
     owned: Array, // Array of projects the user owns
     shared: Array // Array of projects that has been shared to the user 
 });
+
+const User = mongoose.model('User', userSchema); 
 
 // Notification Schema
 const notificationSchema = new mongoose.Schema({
@@ -110,17 +113,17 @@ function authenticate(req, res, next) {
         if (sessions[c.login.username] != undefined && sessions[c.login.username].id == c.login.sessionID) {
             next();
         } else {
-            res.redirect('/app/index.html');
+            res.redirect('/public_html/index/index.html');
         }
     } else {
-        res.redirect('/app/index.html');
+        res.redirect('/public_html/index/index.html');
     }
     
 }
   
 // ------------------------------------------------------------------------------------------------------------
-app.use('/account/*', authenticate);
-app.get('/account/*', (req, res, next) => { 
+app.use('/public_html/account/*', authenticate);
+app.get('/public_html/account/*', (req, res, next) => { 
     next();
 });
 app.use(express.static('public_html'))
@@ -132,113 +135,139 @@ app.get('/server.js', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public_html/app/index.html');
+    res.sendFile(__dirname + '/public_html/index/index.html');
 });
 
 // Serve the Index JS file
-app.get('/public_html/app/index.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/app/index.js');
+app.get('/public_html/index/index.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.js');
 });
 
 // Serve the Index HTML file
-app.get('/app/index.html', (req, res) => {
-    res.sendFile(__dirname + '/public_html/app/index.html');
+app.get('/public_html/index/index.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.html');
 });
 
 // Serve the Index CSS file
-app.get('/public_html/app/index.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/app/index.css');
+app.get('/public_html/index/index.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.css');
 });
 
 // Serve the Home JS file
-app.get('/public_html/account/home.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/home.js');
+app.get('/public_html/account/homepage/home.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
 });
 
 // Serve the Home HTML file
-app.get('/public_html/account/home.html', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/home.html');
+app.get('/public_html/account/homepage/home.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
 });
 
 // Serve the Home CSS file
-app.get('/public_html/account/home.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/home.css');
+app.get('/public_html/account/homepage/home.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
 });
 
-// Serve the Post JS file
-app.get('/public_html/account/post.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/post.js');
+// Serve the Help JS file
+app.get('/help.js', (req, res) => {
+    res.sendFile(__dirname + '/help/help.js');
 });
 
-// Serve the Post HTML file
-app.get('/public_html/account/post.html', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/post.html');
+// Serve the Help HTML file
+app.get('/help.html', (req, res) => {
+    res.sendFile(__dirname + '/help/help.html');
 });
 
-// Serve the Post CSS file
-app.get('/public_html/account/post.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/post.css');
+// Serve the Help CSS file
+app.get('/help.css', (req, res) => {
+    res.sendFile(__dirname + '/help/help.css');
 });
 
 // ------------------------------------------------------------------------------------------------------------
 
 
 
-app.post('account/login', (req, res) => {
-    let u = req.body;
-    let p1 = User.find( {username: u.username, password: u.password} ).exec()
-    p1.then((results) => {
-        if (results.length == 0) {
-            res.end("Could not find account");
-        } else {
-            let sid = addSession(u.username);
-            res.cookie('login',
-                {username: u.username, sessionID: sid},
-                {maxAge: 60000 * 2});
-            res.end('SUCCESS');
-        }
-    })
-})
+app.post('/login', (req, res) => {
+    let userData = req.body;
+    let user = User.find({username: userData.username}).exec();
 
-app.get('/account/create/:user/:pass', (req, res) => {
-    let person1 = User.find({username: req.params.user}).exec();
-    person1.then((results) => {
-        if (results.length == 0) {
+    user.then((results) => {
+        if (results.length === 0) {
+            console.log("User does not exist.");
+            res.status(400).send("User does not exist.");
+        } else {
+            console.log('here');
             let currentUser = results[0];
-            let newSalt = '' + Math.floor(Math.random() * 1000000000);
-            let toHash = req.body + currentUser.salt;
-            let h = crypto.createHash('sha3-256)');
+            let toHash = userData.password + currentUser.salt;
+            console.log("honeycomb")
+            console.log(toHash);
+            let h = crypto.createHash('sha3-256');
             let data = h.update(toHash, 'utf-8');
             let result = data.digest('hex');
 
-            console.log()
-            console.log(req.params.pass);
+            console.log(currentUser.salt);
+            console.log("beehive");
+            console.log(toHash);
+            console.log(result);
+
+            if (result == currentUser.hash) {
+                console.log('Username and password match.');
+                let sid = addSession(userData.username);
+                res.cookie('login', 
+                {username: userData.username, sessionID: sid}, 
+                { maxAge: 60000 * 2 });
+                res.status(200).send('User successfully authenticated.');
+            } else {
+                res.status(500).send('ISSUE OCCURRED.');
+            }
+        }
+    });
+})
+
+app.post('/register', (req, res) => {
+    let userData = req.body;
+    let person = User.find({username: { $regex: userData.username, $options: "i" }}).exec();
+    console.log("cats");
+    person.then((results) => {
+        if (results.length == 0) {
+            console.log("dogs");
+            let newSalt = '' + Math.floor(Math.random() * 1000000000);
+            let toHash = userData.password + newSalt;
+            let h = crypto.createHash('sha3-256');
+            let data = h.update(toHash, 'utf-8');
+            let result = data.digest('hex');
+
             console.log(newSalt);
             console.log(toHash);
             console.log(result);
 
-            let user = new User({
-                username: req.params.user,
-                password: req.params.pass,
+            let newUser = new User({
+                username: userData.username,
                 hash: result,
                 salt: newSalt,
                 owned: Array,
                 shared: Array 
             });
-            let person = user.save();
-            person.then(() => {
-                res.end('USER CREATED');
+            let savedUser = newUser.save();
+            console.log("rain");
+            savedUser.then(() => {
+                console.log("Account successfully created.");
+                console.log("New user: " + newUser);
+                res.status(200).send("Account successfully created.");
             });
-            person.catch(() => {
-                res.end('DATABASE SAVE ISSUE');
-            });
+            savedUser.catch(() => {
+                console.log("Issue creating account.");
+                res.status(500).send("Issue creating account.");
+            })
         } else {
-            res.end('USERNAME ALREADY TAKEN');
+            console.log("Username is taken.");
+            res.status(400).send("Username is taken.");
         }
     })
     
 })
 
-
-setinterval(removeSessions, 5000);
-
+app.listen(port, async () => {
+    console.log(`Server is running at http://${hostname}:${port}`);
+    
+});

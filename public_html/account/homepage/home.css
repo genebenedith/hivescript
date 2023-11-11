@@ -5,7 +5,7 @@
     right: 0;
     left: 0;
     bottom: 0;
-    overflow: auto;
+    
 }
 
 #topSection {
@@ -15,7 +15,6 @@
     right: 0;
     left: 0;
     bottom: 85%;
-    overflow: auto; /* Add overflow property for scrolling */
 }
 
 #bottomSection {
@@ -25,4 +24,5 @@
     right: 0;
     left: 0;
     bottom: 0;
+    overflow: auto;
 }
