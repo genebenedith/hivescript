@@ -186,28 +186,47 @@ app.post('account/login', (req, res) => {
         if (results.length == 0) {
             res.end("Could not find account");
         } else {
-            let sid = addSession(u.username);
-            res.cookie('login',
-                {username: u.username, sessionID: sid},
-                {maxAge: 60000 * 2});
-            res.end('SUCCESS');
+            console.log('here');
+            let currentUser = results[0];
+            let toHash = userData.password + currentUser.salt;
+            console.log("honeycomb")
+            console.log(toHash);
+            let h = crypto.createHash('sha3-256');
+            let data = h.update(toHash, 'utf-8');
+            let result = data.digest('hex');
+
+            console.log(currentUser.salt);
+            console.log("beehive");
+            console.log(toHash);
+            console.log(result);
+
+            if (result == currentUser.hash) {
+                console.log('Username and password match.');
+                let sid = addSession(userData.username);
+                res.cookie('login', 
+                {username: userData.username, sessionID: sid}, 
+                { maxAge: 60000 * 2 });
+                res.status(200).send('User successfully authenticated.');
+            } else {
+                res.status(500).send('ISSUE OCCURRED.');
+            }
         }
     })
 })
 
-app.get('/account/create/:user/:pass', (req, res) => {
-    let person1 = User.find({username: req.params.user}).exec();
-    person1.then((results) => {
+app.post('/register', (req, res) => {
+    let userData = req.body;
+    let person = User.find({username: { $regex: userData.username, $options: "i" }}).exec();
+    console.log("cats");
+    person.then((results) => {
         if (results.length == 0) {
-            let currentUser = results[0];
+            console.log("dogs");
             let newSalt = '' + Math.floor(Math.random() * 1000000000);
             let toHash = req.body + currentUser.salt;
             let h = crypto.createHash('sha3-256)');
             let data = h.update(toHash, 'utf-8');
             let result = data.digest('hex');
 
-            console.log()
-            console.log(req.params.pass);
             console.log(newSalt);
             console.log(toHash);
             console.log(result);
@@ -220,9 +239,12 @@ app.get('/account/create/:user/:pass', (req, res) => {
                 owned: Array,
                 shared: Array 
             });
-            let person = user.save();
-            person.then(() => {
-                res.end('USER CREATED');
+            let savedUser = newUser.save();
+            console.log("rain");
+            savedUser.then(() => {
+                console.log("Account successfully created.");
+                console.log("New user: " + newUser);
+                res.status(200).send("Account successfully created.");
             });
             person.catch(() => {
                 res.end('DATABASE SAVE ISSUE');
