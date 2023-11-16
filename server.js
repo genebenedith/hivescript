@@ -230,6 +230,7 @@ app.post('/register', (req, res) => {
             console.log(newSalt);
             console.log(toHash);
             console.log(result);
+            console.log(result);
 
             let user = new User({
                 username: req.params.user,
