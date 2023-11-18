@@ -160,12 +160,27 @@ app.get('/public_html/account/homepage/home.js', (req, res) => {
 
 // Serve the Home HTML file
 app.get('/public_html/account/homepage/home.html', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
+    res.sendFile(__dirname + '/public_html/account/homepage/home.html');
 });
 
 // Serve the Home CSS file
 app.get('/public_html/account/homepage/home.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
+    res.sendFile(__dirname + '/public_html/account/homepage/home.css');
+});
+
+// Serve the Project JS file
+app.get('/public_html/account/project/src/editor.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/project/src/editor.js');
+});
+
+// Serve the Project HTML file
+app.get('/public_html/account/project/examples/example3.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/project/examples/example3.html');
+});
+
+// Serve the Project CSS file
+app.get('/public_html/account/project.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/project.css');
 });
 
 // Serve the Help JS file
@@ -196,17 +211,14 @@ app.post('/login', (req, res) => {
             console.log("User does not exist.");
             res.status(400).send("User does not exist.");
         } else {
-            console.log('here');
             let currentUser = results[0];
             let toHash = userData.password + currentUser.salt;
-            console.log("honeycomb")
             console.log(toHash);
             let h = crypto.createHash('sha3-256');
             let data = h.update(toHash, 'utf-8');
             let result = data.digest('hex');
 
             console.log(currentUser.salt);
-            console.log("beehive");
             console.log(toHash);
             console.log(result);
 
@@ -227,10 +239,8 @@ app.post('/login', (req, res) => {
 app.post('/register', (req, res) => {
     let userData = req.body;
     let person = User.find({username: { $regex: userData.username, $options: "i" }}).exec();
-    console.log("cats");
     person.then((results) => {
         if (results.length == 0) {
-            console.log("dogs");
             let newSalt = '' + Math.floor(Math.random() * 1000000000);
             let toHash = userData.password + newSalt;
             let h = crypto.createHash('sha3-256');
@@ -249,7 +259,6 @@ app.post('/register', (req, res) => {
                 shared: Array 
             });
             let savedUser = newUser.save();
-            console.log("rain");
             savedUser.then(() => {
                 console.log("Account successfully created.");
                 console.log("New user: " + newUser);
