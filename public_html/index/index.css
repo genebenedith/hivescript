@@ -1,0 +1,82 @@
+
+#bodyContainer{
+    text-align: center;
+} 
+
+#contain-login{
+    padding: 15px;
+    background-color: white;
+    margin-left:20px;
+    margin-right:20px;
+}
+
+#contain-createUser{
+    padding: 15px;
+    margin-top: 30px;
+    margin-left:20px;
+    margin-right:20px;
+    text-align: center;
+    background-color: white;
+}
+
+body{
+    margin: 0px;
+    padding: 0px;
+    text-align: center;
+    font-family: sans-serif;
+    background-color: rgb(253, 213, 89);
+    padding-bottom: 20px;
+}
+
+table{
+    text-align: center;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+tr{
+    text-align: center;
+}
+
+th{
+    text-align: center;
+    padding-top: 15px;
+}
+form{
+    text-align: center;
+}
+
+.indexTextInput{
+    height: 30px;
+    width: 150px;
+    margin-left: 55px;
+    padding-left: 18px;
+    padding-right: 18px;
+    background-color: rgb(255, 235, 176);
+}
+
+.indexPageButton{
+    width: 130px;
+    height: 35px;
+    padding: 4px;
+    margin-top: 20px;
+    text-align: center;
+    text-family: sans-serif;
+    background-color: rgb(255, 235, 176);
+}
+
+h1{
+    font-size: 25px;
+}
+
+img{
+    margin-top: 10px;
+    margin-bottom: 20px;
+    width:120px;
+}
+
+/* 
+.indexLabel{
+
+} 
+*/
