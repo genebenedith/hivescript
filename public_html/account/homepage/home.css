@@ -26,3 +26,39 @@
     bottom: 0;
     overflow: auto;
 }
+
+
+.projectPage {
+    text-align: center;
+    font-size: large;
+    background-color: gold;
+}
+
+.createNewProject {
+    position: relative;
+    display: inline-block;
+    padding: 30px;
+}
+
+.project-card {
+    background-color: rgb(227, 215, 149);
+    display: inline-block;
+    width:  25%;
+    padding: 0 10px;
+    border-radius: 5px;
+    box-shadow: 0 4px 8px 0 rgba(249, 241, 116, 0.2);
+}
+
+
+.viewProject {
+    width: 300px;
+    position: relative;
+    padding: 30px;
+    display: inline-block;
+}
+
+    .viewProject .project-title {
+        font-size: 25px;
+        font-family: sans-serif;
+        color: black;
+    }
