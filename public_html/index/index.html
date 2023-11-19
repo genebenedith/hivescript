@@ -1,0 +1,49 @@
+<!-- 
+Name: Genesis Benedith
+Course: CSC 337
+Description: HTML document for the OSTAA web page, with UI elements 
+Creates input types for logging in and creating accounts 
+-->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HiveScript</title>
+    <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/index/index.css">
+</head>
+<body>
+    <div id="loginSection">
+        <h1>
+            Login 
+        </h1>
+        <form>
+            <label for="username">Username</label>
+            <input type="text" id="username" name="username">
+            <br><br>
+            <label for="password">Password</label>
+            <input type="text" id="password" name="password">
+            <br><br>
+            <input type="submit" id="loginButton" value="Login">
+          </form>
+    </div>
+
+    <div id="createUserSection">
+        <h1>
+            Create Account
+        </h1>
+        <form>
+            <label for="newUsername">Username</label>
+            <input type="text" id="newUsername" name="username">
+            <br><br>
+            <label for="newPassword">Password</label>
+            <input type="text" id="newPassword" name="password">
+            <br><br>
+            <input type="submit" id="createAccountButton" value="Create Account">
+          </form>
+    </div>
+
+    <script src="/public_html/index/index.js"></script>
+</body>
+</html>
