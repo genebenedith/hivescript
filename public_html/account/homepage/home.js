@@ -2,7 +2,7 @@ const logoutButton = document.getElementById("logoutButton");
 
 const username = getUsername();
 const welcomeMessage = document.getElementById('welcomeMessage');
-welcomeMessage.textContent = `Welcome, ${username}!`;
+welcomeMessage.textContent = `${username}'s Projects`;
 
 function getUsername() {
     const cookie = document.cookie;
@@ -21,14 +21,35 @@ function getUsername() {
             const data = JSON.parse(jsonData);
 
             username = data.username;
-            // console.log(data);
             return username;
         }
     }
 }
 
+function createNewProjectCard() {
+    const projectContainer = document.getElementById('projectContainer');
+
+    const newProjectCard = document.createElement('div');
+    newProjectCard.classList.add('project-card');
+
+    const viewProject = document.createElement('div');
+    viewProject.classList.add('viewProject');
+
+    const projectTitle = document.createElement('span');
+    projectTitle.classList.add('project-title');
+    projectTitle.textContent = `New Project ${projectContainer.children.length}`;
+
+    viewProject.appendChild(projectTitle);
+    newProjectCard.appendChild(viewProject);
+
+    projectContainer.appendChild(newProjectCard);
+
+    newProjectCard.addEventListener('click', () => {
+        console.log(`Clicked on ${projectTitle.textContent}`);
+    });
+}
+
 function openNotifications() {
-    // Add your notification logic here
     alert('Notifications opened!');
 }
 
@@ -44,7 +65,6 @@ function logout() {
     console.log("log out");
     const user = getUsername();
     const userData = { username: user };
-    console.log(user);
     let logout = fetch('/logout', {
         method: 'POST',
         body: JSON.stringify(userData),
