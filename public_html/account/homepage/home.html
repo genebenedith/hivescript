@@ -11,14 +11,11 @@
     
 
     <div id="main"> 
-        
-
         <div id="container">
-            
+
             <div id="topSection">
                 <div id="mySidenav" class="sidenav">
                     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-                    <a href="/">About</a>
                     <a href="/">My Profile</a>
                     <a href="/help">Support Center</a>
                     <a href="#" id="logoutButton">Logout</a>
@@ -35,37 +32,22 @@
                 <h2 id="welcomeMessage">
                     What would you like to do?
                 </h2>
+                <hr class="short-line" />
                 <div id="projectPage">
-                    <h1>
-                        My Projects
-                    </h1>
+                    
                     <br/>
                     <div id="listProjects">
-                        <button id="createNewProject"> 
-                            Create New Project
-                        </button>
-                        <div class="project-card">
-                            <div class="viewProject">
-                                <span class="project-title">Project 1</span>
+                        
+                        <div id="projectContainer">
+                            <div class="project-card" id="createNewProjectCard" onclick="createNewProjectCard()">
+                                <div class="viewProject">
+                                    <span class="project-title">Create New Project</span>
+                                </div>
                             </div>
-                        </div>
-            
-                        <div class="project-card">
-                            <div class="viewProject">
-                                <span class="project-title">Project 2</span>
-                            </div>
-                        </div>
-            
-                        <div class="project-card">
-                            <div class="viewProject">
-                                <span class="project-title">Project 3</span>
-                            </div>
-                        </div>
 
                         </div>
                     </div>
                 </div>
-        
             </div>
         </div>
     </div>
