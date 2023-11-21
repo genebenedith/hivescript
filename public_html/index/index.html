@@ -1,10 +1,3 @@
-<!-- 
-Name: Genesis Benedith
-Course: CSC 337
-Description: HTML document for the OSTAA web page, with UI elements 
-Creates input types for logging in and creating accounts 
--->
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -12,39 +5,69 @@ Creates input types for logging in and creating accounts
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login: HiveScript</title>
     <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/index/index.css">
-    <script src="/public_html/index/index.js"></script>
-    <link rel="icon" href="./logo6-without-name.pdf">
+    
+    <link rel="icon" href="/public_html/img/hivescript_new_logo.png">
 </head>
+
 <body>
-    <div id="loginSection">
+    <div id="bodyContainer">
+        <img src="/public_html/img/hivescript_new_logo.png" alt="hive script logo">
+
+        <div id="contain-login">
         <h1>
             Login 
-        </h1>
+        </h1> 
         <form>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username">
-            <br><br>
-            <label for="password">Password</label>
-            <input type="text" id="password" name="password">
-            <br><br>
-            <input type="submit" id="loginButton" value="Login">
+            <table>
+                <tr>
+                <th>
+                <label for="username" class="indexLabel">Username:</label>
+                </th>
+                <th>
+                <input type="text" id="username" class="indexTextInput" name="username">
+                </th>
+                </tr>
+                <tr>
+                <th>
+                <label for="password" class="indexLabel">Password:</label>
+                </th>
+                <th>
+                <input type="text" id="password" class="indexTextInput" name="password">
+                </th>
+                </tr>
+            </table>
+            <input type="submit" class="indexPageButton" id="loginButton" value="Login">
           </form>
-    </div>
+      </div>  <!-- end of id="contain-login" -->
+      
 
-    <div id="createUserSection">
+      <div id="contain-createUser">
         <h1>
             Create Account
         </h1>
         <form>
-            <label for="newUsername">Username</label>
-            <input type="text" id="newUsername" name="username">
-            <br><br>
-            <label for="newPassword">Password</label>
-            <input type="text" id="newPassword" name="password">
-            <br><br>
-            <input type="submit" id="createAccountButton" value="Create Account">
+            <table>
+                <tr>
+                <th>
+                <label for="newUsername" class="indexLabel">Username:</label>
+                </th>
+                <th>
+                <input type="text" id="newUsername" class="indexTextInput" name="username">
+                </th>
+                </tr>
+                <tr>
+                <th>
+                <label for="newPassword" class="indexLabel">Password:</label>
+                </th>
+                <th>
+                <input type="text" id="newPassword" class="indexTextInput" name="password">
+                </th>
+                </tr>
+            </table>
+            <input type="submit" class="indexPageButton" id="createAccountButton" value="Create Account">
           </form>
-    </div>
+      </div>  <!-- end of id="contain-createUser" -->
+    </div>  <!-- end of id="bodyContainer" -->
 
     <script src="/public_html/index/index.js"></script>
 </body>
