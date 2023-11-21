@@ -104,6 +104,8 @@ app.use((error, req, res, next) => {
     }
   });
 
+app.use('/public_html', express.static('public_html'));
+
 function authenticate(req, res, next) {
     let c = req.cookies;
     console.log('auth request');
@@ -113,20 +115,22 @@ function authenticate(req, res, next) {
         if (sessions[c.login.username] != undefined && sessions[c.login.username].id == c.login.sessionID) {
             next();
         } else {
-            res.redirect('/public_html/index/index.html');
+            res.redirect('/index');
         }
     } else {
-        res.redirect('/public_html/index/index.html');
+        res.redirect('/index');
     }
     
 }
-  
+
+// app.use('/public_html/account/*', authenticate);
+// app.get('/public_html/account/*', (req, res, next) => { 
+//   console.log('another');
+//   next();
+// });
+app.use('/public_html/account', authenticate, express.static('public_html/account'));
+
 // ------------------------------------------------------------------------------------------------------------
-app.use('/public_html/account/*', authenticate);
-app.get('/public_html/account/*', (req, res, next) => { 
-    next();
-});
-app.use(express.static('public_html'))
 
 
 // Serve the Server JS file 
@@ -134,69 +138,74 @@ app.get('/server.js', (req, res) => {
     res.sendFile(__dirname + '/server.js');
 });
 
-app.get('/', (req, res) => {
+app.get('/index', (req, res) => {
     res.sendFile(__dirname + '/public_html/index/index.html');
 });
 
-// Serve the Index JS file
-app.get('/public_html/index/index.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/index/index.js');
-});
+// // Serve the Index JS file
+// app.get('/public_html/index/index.js', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/index/index.js');
+// });
 
-// Serve the Index HTML file
-app.get('/public_html/index/index.html', (req, res) => {
-    res.sendFile(__dirname + '/public_html/index/index.html');
-});
+// // Serve the Index HTML file
+// app.get('/public_html/index/index.html', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/index/index.html');
+// });
 
-// Serve the Index CSS file
-app.get('/public_html/index/index.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/index/index.css');
-});
+// // Serve the Index CSS file
+// app.get('/public_html/index/index.css', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/index/index.css');
+// });
 
-// Serve the Home JS file
-app.get('/public_html/account/homepage/home.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
-});
+// // Serve the Home JS file
+// app.get('/public_html/account/homepage/home.js', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/account/homepage/home.js');
+// });
 
 // Serve the Home HTML file
-app.get('/public_html/account/homepage/home.html', (req, res) => {
+app.get('/public_html/account/homepage/home.html', authenticate, (req, res) => {
     res.sendFile(__dirname + '/public_html/account/homepage/home.html');
 });
 
-// Serve the Home CSS file
-app.get('/public_html/account/homepage/home.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/homepage/home.css');
-});
+// // Serve the Home CSS file
+// app.get('/public_html/account/homepage/home.css', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/account/homepage/home.css');
+// });
 
-// Serve the Project JS file
-app.get('/public_html/account/project/src/editor.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/project/src/editor.js');
-});
+// // Serve the Project JS file
+// app.get('/public_html/account/project/src/editor.js', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/account/project/src/editor.js');
+// });
 
-// Serve the Project HTML file
-app.get('/public_html/account/project/examples/example3.html', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/project/examples/example3.html');
-});
+// // Serve the Project HTML file
+// app.get('/public_html/account/project/examples/example3.html', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/account/project/examples/example3.html');
+// });
 
-// Serve the Project CSS file
-app.get('/public_html/account/project.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/project.css');
-});
+// // Serve the Project CSS file
+// app.get('/public_html/account/project.css', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/account/project.css');
+// });
 
-// Serve the Help JS file
-app.get('/help.js', (req, res) => {
-    res.sendFile(__dirname + '/help/help.js');
-});
+// // Serve the Help JS file
+// app.get('/help.js', (req, res) => {
+//     res.sendFile(__dirname + '/help/help.js');
+// });
 
 // Serve the Help HTML file
-app.get('/help.html', (req, res) => {
-    res.sendFile(__dirname + '/help/help.html');
+app.get('/help', (req, res) => {
+    res.sendFile(__dirname + '/public_html/help/help.html');
 });
 
-// Serve the Help CSS file
-app.get('/help.css', (req, res) => {
-    res.sendFile(__dirname + '/help/help.css');
-});
+// // Serve the Help CSS file
+// app.get('/help.css', (req, res) => {
+//     res.sendFile(__dirname + '/help/help.css');
+// });
+
+// Serve the image file
+// app.get('/public_html/img/hivescript_new_logo.png', (req, res) => {
+//     res.sendFile(__dirname + '/public_html/img/hivescript_new_logo.png');
+// });
 
 // ------------------------------------------------------------------------------------------------------------
 
@@ -250,7 +259,7 @@ app.post('/register', (req, res) => {
             console.log(newSalt);
             console.log(toHash);
             console.log(result);
-            
+
             let newUser = new User({
                 username: userData.username,
                 hash: result,
@@ -275,6 +284,21 @@ app.post('/register', (req, res) => {
     })
     
 })
+
+app.post('/logout', (req, res) => {
+    const username = req.body.username;
+    if (username) {
+        delete sessions[username];
+        res.clearCookie('login');
+        console.log(`User ${username} logged out.`);
+        res.status(200).send('User logged out successfully.');
+    } else {
+        console.log('No user to log out.');
+        res.status(400).send('No user to log out.');
+    }
+});
+
+
 
 app.listen(port, async () => {
     console.log(`Server is running at http://${hostname}:${port}`);
