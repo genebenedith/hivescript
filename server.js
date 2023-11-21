@@ -250,7 +250,7 @@ app.post('/register', (req, res) => {
             console.log(newSalt);
             console.log(toHash);
             console.log(result);
-            console.log('hello');
+            
             let newUser = new User({
                 username: userData.username,
                 hash: result,
