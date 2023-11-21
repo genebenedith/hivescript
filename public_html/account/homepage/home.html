@@ -4,51 +4,53 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HiveScript | Home</title>
-    <link id="cssFile" rel="stylesheet" type="text/css" href="./home.css">
+    <link rel="icon" type="image/x-icon" href="/public_html/img/hivescript_new_logo.png">
+    <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/account/homepage/home.css">
 </head>
 <body>
-    <div id="container">
-        <div id="topSection">
-            <h1>
-                Home
-            </h1>
-            <br><br>
-        </div>
     
-        <div id="bottomSection">
-            <div id="projectPage">
-                <h1>
-                    My Projects
-                </h1>
-                <br/>
-                <div id="listProjects">
-                    <button id="createNewProject"> 
-                        Create New Project
-                    </button>
-                    <div class="project-card">
-                        <div class="viewProject">
-                            <span class="project-title">Project 1</span>
-                        </div>
-                    </div>
-        
-                    <div class="project-card">
-                        <div class="viewProject">
-                            <span class="project-title">Project 2</span>
-                        </div>
-                    </div>
-        
-                    <div class="project-card">
-                        <div class="viewProject">
-                            <span class="project-title">Project 3</span>
-                        </div>
-                    </div>
 
+    <div id="main"> 
+        <div id="container">
+
+            <div id="topSection">
+                <div id="mySidenav" class="sidenav">
+                    <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+                    <a href="/">My Profile</a>
+                    <a href="/help">Support Center</a>
+                    <a href="#" id="logoutButton">Logout</a>
+                </div>
+            
+                
+                <span class="open-btn" onclick="openNav()">&#9776; open</span>
+                <button class="notification-btn" onclick="openNotifications()">🔔</button>
+                <img src="/public_html/img/hivescript_new_logo.png" alt="Logo" class="logo">
+                <br><br>
+            </div>
+            
+            <div id="bottomSection">
+                <h2 id="welcomeMessage">
+                    What would you like to do?
+                </h2>
+                <hr class="short-line" />
+                <div id="projectPage">
+                    
+                    <br/>
+                    <div id="listProjects">
+                        
+                        <div id="projectContainer">
+                            <div class="project-card" id="createNewProjectCard" onclick="createNewProjectCard()">
+                                <div class="viewProject">
+                                    <span class="project-title">Create New Project</span>
+                                </div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
             </div>
-    
         </div>
     </div>
-    <script src="./home.js"></script>
+    <script src="/public_html/account/homepage/home.js"></script>
 </body>
 </html>

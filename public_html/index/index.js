@@ -1,4 +1,3 @@
-
 const loginButton = document.getElementById("loginButton");
 const createAccountButton = document.getElementById("createAccountButton");
 
@@ -64,7 +63,7 @@ function login(event) {
     auth.then((response) => {
         if (response.status === 200) {
             console.log("User successfully authenticated.");
-            window.location.href = '../account/homepage/home.html';
+            window.location.href = '/public_html/account/homepage/home.html';
         } else if (response.status === 500) {
             alert("Issue authenticating user.");
         } else if (response.status === 400) {
