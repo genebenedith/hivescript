@@ -181,7 +181,23 @@ app.get('/public_html/account/homepage/home.css', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/homepage/home.css');
 });
 
-// Serve the views directory
+// Serve the Profile JS file
+app.get('/public_html/account/profile/profile.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/profile/profile.js');
+});
+
+// Serve the Profile HTML file
+app.get('/public_html/account/profile/profile.html', authenticate, (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/profile/profile.html');
+});
+
+// Serve the Profile CSS file
+app.get('/public_html/account/profile/profile.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/profile/profile.css');
+});
+
+
+// Serve the project directory
 app.get('/public_html/account/project', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/project');
 });
