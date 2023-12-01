@@ -4,6 +4,8 @@ const express = require('express');
 const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const crypto = require('crypto');
+const path = require('path');
+const uuid = require('uuid');
 
 const port = 80; 
 const hostname = 'localhost'; // For now 
@@ -29,8 +31,8 @@ const userSchema = new mongoose.Schema({
     notifications: Array,
     hash: String, // Hashing of password 
     salt: String, // Randomized salt 
-    owned: Array, // Array of projects the user owns
-    shared: Array // Array of projects that has been shared to the user 
+    owned: [], // Array of projects the user owns
+    shared: [] // Array of projects that has been shared to the user 
 });
 
 const User = mongoose.model('User', userSchema); 
@@ -59,12 +61,16 @@ const notificationSchema = new mongoose.Schema({
     },
   });
 
-// User Schema 
+const Notification = mongoose.model('Notification', notificationSchema); 
+
 const projectSchema = new mongoose.Schema({
-    owner: String,
-    urlPath: String,
-    invitees: Array
+    projectId: String,
+    queenBee: String, // the owner of the project
+    workingBees: Array, // the invited participants to the project
+    projectTitle: String // Title of the project
 });
+
+const Project = mongoose.model('Project', projectSchema); 
 
 let sessions = {};
 
@@ -92,6 +98,8 @@ setInterval(removeSessions, 5000);
 // ------------------------------------------------------------------------------------------------------------
 
 const app = express();
+app.set('views', path.join(__dirname, 'public_html/account/project'));
+app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(express.json());
 
@@ -103,8 +111,6 @@ app.use((error, req, res, next) => {
       next();
     }
   });
-
-app.use('/public_html', express.static('public_html'));
 
 function authenticate(req, res, next) {
     let c = req.cookies;
@@ -123,12 +129,11 @@ function authenticate(req, res, next) {
     
 }
 
-// app.use('/public_html/account/*', authenticate);
-// app.get('/public_html/account/*', (req, res, next) => { 
-//   console.log('another');
-//   next();
-// });
 app.use('/public_html/account', authenticate, express.static('public_html/account'));
+// app.use('/public_html', express.static('public_html'));
+
+// app.use(authenticate);
+// app.use('/public_html', express.static('public_html'));
 
 // ------------------------------------------------------------------------------------------------------------
 
@@ -138,54 +143,58 @@ app.get('/server.js', (req, res) => {
     res.sendFile(__dirname + '/server.js');
 });
 
+app.get('/', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.html');
+});
+
 app.get('/index', (req, res) => {
     res.sendFile(__dirname + '/public_html/index/index.html');
 });
 
-// // Serve the Index JS file
-// app.get('/public_html/index/index.js', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/index/index.js');
-// });
+// Serve the Index JS file
+app.get('/public_html/index/index.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.js');
+});
 
-// // Serve the Index HTML file
-// app.get('/public_html/index/index.html', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/index/index.html');
-// });
+// Serve the Index HTML file
+app.get('/public_html/index/index.html', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.html');
+});
 
-// // Serve the Index CSS file
-// app.get('/public_html/index/index.css', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/index/index.css');
-// });
+// Serve the Index CSS file
+app.get('/public_html/index/index.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/index/index.css');
+});
 
-// // Serve the Home JS file
-// app.get('/public_html/account/homepage/home.js', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/account/homepage/home.js');
-// });
+// Serve the Home JS file
+app.get('/public_html/account/homepage/home.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/homepage/home.js');
+});
 
 // Serve the Home HTML file
 app.get('/public_html/account/homepage/home.html', authenticate, (req, res) => {
     res.sendFile(__dirname + '/public_html/account/homepage/home.html');
 });
 
-// // Serve the Home CSS file
-// app.get('/public_html/account/homepage/home.css', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/account/homepage/home.css');
-// });
+// Serve the Home CSS file
+app.get('/public_html/account/homepage/home.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/homepage/home.css');
+});
 
-// // Serve the Project JS file
-// app.get('/public_html/account/project/src/editor.js', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/account/project/src/editor.js');
-// });
+// Serve the views directory
+app.get('/public_html/account/project', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/project');
+});
 
-// // Serve the Project HTML file
-// app.get('/public_html/account/project/examples/example3.html', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/account/project/examples/example3.html');
-// });
+// Serve the project.ejs
+app.get('/public_html/account/project/project.ejs', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/project/project.ejs');
+});
 
-// // Serve the Project CSS file
-// app.get('/public_html/account/project.css', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/account/project.css');
-// });
+// Serve the Project CSS file
+app.get('/public_html/account/project/project.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/project/project.css');
+});
 
 // // Serve the Help JS file
 // app.get('/help.js', (req, res) => {
@@ -203,13 +212,62 @@ app.get('/help', (req, res) => {
 // });
 
 // Serve the image file
-// app.get('/public_html/img/hivescript_new_logo.png', (req, res) => {
-//     res.sendFile(__dirname + '/public_html/img/hivescript_new_logo.png');
-// });
+app.get('/public_html/img/hivescript_new_logo.png', (req, res) => {
+    res.sendFile(__dirname + '/public_html/img/hivescript_new_logo.png');
+});
+
+app.get('/profile/:username', authenticate, (req, res) => {
+    const username = req.params.username;
+    // Fetch user data from the database based on the username
+    // Render the profile page with the user's information
+    res.render('profile', { username: username });
+});
+
+app.get('/project/:projectId', authenticate, async (req, res) => {
+    const projectId = req.params.projectId;
+    
+    try {
+        const project = await Project.findOne({ projectId: projectId }).exec();
+        if (!project) {
+            // Handle case where project with the specified ID is not found
+            res.status(404).send('Project not found');
+        } else {
+            // Render the project page with the project details
+            res.render('project', { project: project });
+        }
+    } catch (error) {
+        console.error('Error fetching project details:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+app.get('/user/:username/projects', authenticate, async (req, res) => {
+    const username = req.params.username;
+
+    try {
+        const user = await User.findOne({ username: username }).exec();
+        if (!user) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        // Fetch the projects owned by the user
+        const projects = await Project.find({ queenBee: username }).exec();
+
+        // Map the projects to include only relevant information (projectId and projectTitle)
+        const mappedProjects = projects.map(project => ({
+            projectId: project.projectId,
+            projectTitle: project.projectTitle
+        }));
+
+        res.json(mappedProjects);
+    } catch (error) {
+        console.error('Error fetching user projects:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
 
 // ------------------------------------------------------------------------------------------------------------
-
-
 
 app.post('/login', (req, res) => {
     let userData = req.body;
@@ -259,10 +317,11 @@ app.post('/register', (req, res) => {
             console.log(newSalt);
             console.log(toHash);
             console.log(result);
-            console.log(result);
 
             let newUser = new User({
                 username: userData.username,
+                firstName: userData.firstName,
+                lastName: userData.lastname,
                 hash: result,
                 salt: newSalt,
                 owned: Array,
@@ -299,7 +358,96 @@ app.post('/logout', (req, res) => {
     }
 });
 
+app.post('/project/create', async (req, res) => {
+    console.log('Received data:', req.body);
+    const userData = req.body;
 
+    try {
+        const user = await User.findOne({ username: userData.username }).exec();
+
+        if (!user) {
+            console.log("User does not exist.");
+            res.status(400).send("User does not exist.");
+            return;
+        }
+
+        // Generate a unique project ID using uuid
+        const newProjectId = uuid.v4();
+
+        const newProject = new Project({
+            projectId: newProjectId,
+            queenBee: userData.username,
+            workingBees: [],
+            projectTitle: "New Project" // Provide a default title
+        });
+
+        await newProject.save();
+
+        // Update the user's "owned" array with the new project's ID
+        user.owned.push(newProject._id);
+        await user.save();
+
+        // Send the JSON response with project information
+        res.status(200).json({
+            projectId: newProject.projectId,
+            projectTitle: newProject.projectTitle
+        });
+    } catch (error) {
+        console.error("Error creating project:", error);
+        res.status(500).send("Error creating project.");
+    }
+});
+
+// Handle request to modify the project title
+app.post('/project/:projectId/modify-title', async (req, res) => {
+    const projectId = req.params.projectId;
+    const { newTitle } = req.body;
+
+    try {
+        const project = await Project.findOne({ projectId }).exec();
+
+        if (!project) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        // Update the project title
+        project.projectTitle = newTitle;
+        await project.save();
+
+        res.status(200).send("Project title modified successfully.");
+    } catch (error) {
+        console.error("Error modifying project title:", error);
+        res.status(500).send("Error modifying project title.");
+    }
+});
+
+// Handle request to delete a project
+app.post('/project/:projectId/delete', async (req, res) => {
+    const projectId = req.params.projectId;
+
+    try {
+        // Find and delete the project
+        const deletedProject = await Project.findOneAndDelete({ projectId }).exec();
+
+        if (!deletedProject) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        // Remove the project ID from the owner's "owned" array
+        const owner = await User.findOne({ username: deletedProject.queenBee }).exec();
+        owner.owned = owner.owned.filter(id => id.toString() !== deletedProject._id.toString());
+        await owner.save();
+
+        res.status(200).send("Project deleted successfully.");
+    } catch (error) {
+        console.error("Error deleting project:", error);
+        res.status(500).send("Error deleting project.");
+    }
+});
 
 app.listen(port, async () => {
     console.log(`Server is running at http://${hostname}:${port}`);
