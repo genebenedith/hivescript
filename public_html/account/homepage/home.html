@@ -4,8 +4,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HiveScript | Home</title>
+    <!-- Logo -->
     <link rel="icon" type="image/x-icon" href="/public_html/img/hivescript_new_logo.png">
+    <!-- Stylesheet -->
     <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/account/homepage/home.css">
+    <!-- Icons for Pencil and Trash -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha384-XXX..." crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+    <!-- Fonts -->
+    <link href='https://fonts.googleapis.com/css?family=Josefin Sans' rel='stylesheet'>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
 </head>
 <body>
     
@@ -16,15 +24,19 @@
             <div id="topSection">
                 <div id="mySidenav" class="sidenav">
                     <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-                    <a href="/">My Profile</a>
+                    <a href="#" id="profileButton" onclick="visitProfile('profile')">My Profile</a>
                     <a href="/help">Support Center</a>
-                    <a href="#" id="logoutButton">Logout</a>
+                    <a href="#" id="logoutButton" onclick="logout()">Logout</a>
                 </div>
             
                 
-                <span class="open-btn" onclick="openNav()">&#9776; open</span>
-                <button class="notification-btn" onclick="openNotifications()">🔔</button>
+                
                 <img src="/public_html/img/hivescript_new_logo.png" alt="Logo" class="logo">
+                <span class="openButton" onclick="openNav()">&#9776;</span>
+                <button class="notificationButton" onclick="visitProfile('notifications')">
+                    <span class="material-icons">notifications</span>
+                    <span class="notificationButton__badge">2</span>
+                </button>
                 <br><br>
             </div>
             
@@ -37,9 +49,8 @@
                     
                     <br/>
                     <div id="listProjects">
-                        
                         <div id="projectContainer">
-                            <div class="project-card" id="createNewProjectCard" onclick="createNewProjectCard()">
+                            <div class="project-card" id="createNewProjectCard">
                                 <div class="viewProject">
                                     <span class="project-title">Create New Project</span>
                                 </div>

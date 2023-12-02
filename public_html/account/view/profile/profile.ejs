@@ -1,0 +1,71 @@
+<!-- views/profile.ejs -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/public_html/img/hivescript_new_logo.png">
+    <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/account/view/profile/profile.css">
+    <!--Adding Bootstrap-->
+    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel='stylesheet' href='https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css'>
+    <script src='https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js'></script>
+    <title>My Profile</title>
+</head>
+<body>
+    <div class="container bootstrap snippets bootdey profile-box">
+        <div class="row">
+            <div class="profile-nav col-md-3">
+                <div class="user-heading round">
+                    <a href="#">
+                        <img src="https://avatars.dicebear.com/api/adventurer-neutral/mail%40ashallendesign.co.uk.svg">
+                    </a>
+                    <h1><b><%= user.firstName %> <%= user.lastName %></b></h1>
+                    <p><i>@<%= user.username %></i></p>
+                    <p>Member Since <%= user.dateJoined %></p>
+                </div>
+                <ul class="nav nav-pills nav-stacked">
+                    <li class="active"><a href="#" onclick="showTab('profile-tab')"> <i class="fa fa-user"></i>Profile</a></li>
+                    <li><a href="#notifications" onclick="showTab('notifications-tab')"> <i class="fa fa-calendar"></i>Notifications <span class="label label-warning pull-right r-activity">9</span></a></li>
+                    <li><a href="#edit" onclick="showTab('edit-tab')"> <i class="fa fa-edit"></i>Edit Profile</a></li>
+                </ul>
+            </div>
+            <div class="panel">
+                <div class="profile-graph-heading">
+                    Your HiveScript Profile
+                </div>
+                <div class="panel-body profile-content" id="profile-tab">
+                    <!-- Profile Content -->
+                    <h1>Profile</h1>
+                    <div class="row">
+                        <div class="bio-row">
+                            <p><span>First Name </span>: <%= user.firstName %></p>
+                        </div>
+                        <div class="bio-row">
+                            <p><span>Last Name </span>: <%= user.lastName %></p>
+                        </div>
+                        <div class="bio-row">
+                            <p><span>Username </span>: <%= user.username %></p>
+                        </div>
+                        <div class="bio-row">
+                            <p><span>Display Name </span>: <%= user.displayName %></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="panel-body profile-content" id="notifications-tab" style="display: none;">
+                    <!-- Notifications Content -->
+                    <h1>Notifications</h1>
+                    <p>Notification content goes here.</p>
+                </div>
+                <div class="panel-body profile-content" id="edit-tab" style="display: none;">
+                    <!-- Edit Profile Content -->
+                    <h1>Edit Profile</h1>
+                    <p>Edit profile content goes here.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/public_html/account/view/profile/profile.js"></script>
+</body>
+</html>
