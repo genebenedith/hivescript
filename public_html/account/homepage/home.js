@@ -1,6 +1,3 @@
-// const profileButton = document.getElementById("profileButton");
-// const logoutButton = document.getElementById("logoutButton");
-
 const username = getUsername();
 const welcomeMessage = document.getElementById('welcomeMessage');
 welcomeMessage.textContent = `${username.slice(0,1).toUpperCase()}${username.slice(1).toLowerCase()}'s Projects`;
@@ -257,6 +254,3 @@ function logout() {
         console.error("Logout error:", error);
     });
 }
-
-// profileButton.addEventListener("click", visitProfile("profile"));
-// logoutButton.addEventListener("click", logout);
