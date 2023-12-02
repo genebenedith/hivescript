@@ -27,6 +27,7 @@ const userSchema = new mongoose.Schema({
     lastName: String,
     username: String,
     displayName: String,
+    dateJoined: String,
     lastActivity: Date,
     notifications: Array,
     hash: String, // Hashing of password 
@@ -98,10 +99,10 @@ setInterval(removeSessions, 5000);
 // ------------------------------------------------------------------------------------------------------------
 
 const app = express();
-app.set('views', path.join(__dirname, 'public_html/account/project'));
-app.set('view engine', 'ejs');
 app.use(cookieParser());
 app.use(express.json());
+app.set('views', path.join(__dirname, 'public_html/account/view'));
+app.set('view engine', 'ejs');
 
 // Error handling middleware for JSON parsing errors
 app.use((error, req, res, next) => {
@@ -144,7 +145,16 @@ app.get('/server.js', (req, res) => {
 });
 
 app.get('/', (req, res) => {
-    res.sendFile(__dirname + '/public_html/index/index.html');
+    let c = req.cookies;
+    if (c != undefined && c.login && c.login.username) {
+        if (sessions[c.login.username] != undefined && sessions[c.login.username].id == c.login.sessionID) {
+            res.redirect('/public_html/account/homepage/home.html');
+        } else {
+            res.redirect('/index');
+        }
+    } else {
+        res.redirect('/index');
+    }
 });
 
 app.get('/index', (req, res) => {
@@ -182,34 +192,40 @@ app.get('/public_html/account/homepage/home.css', (req, res) => {
 });
 
 // Serve the Profile JS file
-app.get('/public_html/account/profile/profile.js', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/profile/profile.js');
+app.get('/public_html/account/view/profile/profile.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/profile/profile.js');
 });
 
-// Serve the Profile HTML file
-app.get('/public_html/account/profile/profile.html', authenticate, (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/profile/profile.html');
+// Serve the Profile EJS file
+app.get('/profile/:username', authenticate, async (req, res) => {
+    console.log("here");
+    console.log("cake");
+    const username = req.params.username;
+    const tab = req.query.tab || 'profile';
+    
+    try {
+        const user = await User.findOne({ username: username }).exec();
+        if (!user) {
+            // Handle case where user with the specified username is not found
+            res.status(404).send('User not found');
+        } else {
+            // Render the user's profile page with the user details
+            res.render('profile/profile', { user: user, tab: tab });
+        }
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        res.status(500).send('Internal Server Error');
+    }
 });
 
 // Serve the Profile CSS file
-app.get('/public_html/account/profile/profile.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/profile/profile.css');
-});
-
-
-// Serve the project directory
-app.get('/public_html/account/project', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/project');
-});
-
-// Serve the project.ejs
-app.get('/public_html/account/project/project.ejs', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/project/project.ejs');
+app.get('/public_html/account/view/profile/profile.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/profile/profile.css');
 });
 
 // Serve the Project CSS file
-app.get('/public_html/account/project/project.css', (req, res) => {
-    res.sendFile(__dirname + '/public_html/account/project/project.css');
+app.get('/public_html/account/view/project/project.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/project.css');
 });
 
 // // Serve the Help JS file
@@ -222,21 +238,14 @@ app.get('/help', (req, res) => {
     res.sendFile(__dirname + '/public_html/help/help.html');
 });
 
-// // Serve the Help CSS file
-// app.get('/help.css', (req, res) => {
-//     res.sendFile(__dirname + '/help/help.css');
-// });
+// Serve the Help CSS file
+app.get('/public_html/help/help.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/help/help.css');
+});
 
 // Serve the image file
 app.get('/public_html/img/hivescript_new_logo.png', (req, res) => {
     res.sendFile(__dirname + '/public_html/img/hivescript_new_logo.png');
-});
-
-app.get('/profile/:username', authenticate, (req, res) => {
-    const username = req.params.username;
-    // Fetch user data from the database based on the username
-    // Render the profile page with the user's information
-    res.render('profile', { username: username });
 });
 
 app.get('/project/:projectId', authenticate, async (req, res) => {
@@ -249,7 +258,7 @@ app.get('/project/:projectId', authenticate, async (req, res) => {
             res.status(404).send('Project not found');
         } else {
             // Render the project page with the project details
-            res.render('project', { project: project });
+            res.render('project/project', { project: project });
         }
     } catch (error) {
         console.error('Error fetching project details:', error);
@@ -283,6 +292,7 @@ app.get('/user/:username/projects', authenticate, async (req, res) => {
     }
 });
 
+// POST Requests 
 // ------------------------------------------------------------------------------------------------------------
 
 app.post('/login', (req, res) => {
@@ -334,10 +344,20 @@ app.post('/register', (req, res) => {
             console.log(toHash);
             console.log(result);
 
+            const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+
+            const d = new Date();
+            let monthJoined = month[d.getUTCMonth()];
+            let yearJoined = d.getUTCFullYear();
+            let dateJoined = `${monthJoined} ${yearJoined}`;
+
             let newUser = new User({
                 username: userData.username,
                 firstName: userData.firstName,
                 lastName: userData.lastname,
+                displayName: userData.username,
+                dateJoined: dateJoined,
+                notifications: Array,
                 hash: result,
                 salt: newSalt,
                 owned: Array,
