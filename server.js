@@ -223,6 +223,11 @@ app.get('/public_html/account/view/profile/profile.css', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/view/profile/profile.css');
 });
 
+// Serve the Project MJS file
+app.get('/public_html/account/view/project/project.mjs', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/project.mjs');
+});
+
 // Serve the Project CSS file
 app.get('/public_html/account/view/project/project.css', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/view/project/project.css');
