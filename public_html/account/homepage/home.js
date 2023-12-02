@@ -1,8 +1,9 @@
-const logoutButton = document.getElementById("logoutButton");
+// const profileButton = document.getElementById("profileButton");
+// const logoutButton = document.getElementById("logoutButton");
 
 const username = getUsername();
 const welcomeMessage = document.getElementById('welcomeMessage');
-welcomeMessage.textContent = `${username}'s Projects`;
+welcomeMessage.textContent = `${username.slice(0,1).toUpperCase()}${username.slice(1).toLowerCase()}'s Projects`;
 
 document.addEventListener('DOMContentLoaded', () => {
     fetchUserProjects();
@@ -55,43 +56,27 @@ function getUsername() {
     }
 }
 
-// function createProjectCard(project) {
-//     const projectCard = document.createElement('div');
-//     projectCard.classList.add('project-card');
+function getFirstName() {
+    const cookie = document.cookie;
+    const cookiePairs = cookie.split('; ');
 
-//     // Save the project ID and title as custom data attributes
-//     projectCard.dataset.projectId = project ? project.projectId : '';
-//     projectCard.dataset.projectTitle = project ? project.projectTitle : '';
+    let firstName = '';
 
-//     const viewProject = document.createElement('div');
-//     viewProject.classList.add('viewProject');
+    for (const cookiePair of cookiePairs) {
+        const [name, value] = cookiePair.split('=');
+        if (name === 'login') {
+            const encodedData = decodeURIComponent(value);
+            
+            const jsonStart = encodedData.indexOf('{');
+            const jsonData = encodedData.substring(jsonStart);
 
-//     const projectTitle = document.createElement('span');
-//     projectTitle.classList.add('project-title');
-//     projectTitle.textContent = project ? project.projectTitle : 'New Project'; // Provide a default title
+            const data = JSON.parse(jsonData);
 
-//     viewProject.appendChild(projectTitle);
-//     projectCard.appendChild(viewProject);
-
-//     projectCard.addEventListener('click', () => {
-//         const clickedProjectId = projectCard.dataset.projectId;
-
-//         // Make a request to the server to fetch project details
-//         fetch(`/project/${clickedProjectId}`)
-//             .then(response => {
-//                 if (response.status === 200) {
-//                     window.location.href = `/project/${clickedProjectId}`;
-//                 } else {
-//                     console.error('Error fetching project details:', response.statusText);
-//                 }
-//             })
-//             .catch(error => {
-//                 console.error('Error fetching project details:', error);
-//             });
-//     });
-
-//     return projectCard;
-// }
+            firstName = data.firstName;
+            return firstName;
+        }
+    }
+}
 
 function createProjectCard(project) {
     const projectCard = document.createElement('div');
@@ -222,16 +207,33 @@ function createNewProject() {
         .catch(error => console.error('Error creating a new project:', error));
 }
 
-function openNotifications() {
-    alert('Notifications opened!');
-}
-
 function openNav() {
     document.getElementById("mySidenav").style.width = "250px";
 }
 
 function closeNav() {
     document.getElementById("mySidenav").style.width = "0";
+}
+
+function visitProfile(tab) {
+    const username = getUsername();
+    console.log(tab);
+
+        // Make a request to the server to fetch user profile
+        fetch(`/profile/${username}?tab=${tab}`)
+            .then(response => {
+                if (response.status === 200) {
+                    console.log("soda");
+                    window.location.href = `/profile/${username}?tab=${tab}`;
+                } else {
+                    console.log("pie");
+                    console.error('Error fetching user profile:', response.statusText);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user profile:', error);
+            });
+        console.log('done?');
 }
 
 function logout() {
@@ -256,4 +258,5 @@ function logout() {
     });
 }
 
-logoutButton.addEventListener("click", logout);
+// profileButton.addEventListener("click", visitProfile("profile"));
+// logoutButton.addEventListener("click", logout);
