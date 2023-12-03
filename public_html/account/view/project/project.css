@@ -1,0 +1,36 @@
+.cm-editor { 
+    text-align: left;
+    background-color: #fff4c6;
+    height: 300px; 
+    border: 1px solid #ddd;
+    margin: 20px
+
+}
+
+.cm-scroller { 
+    overflow: auto; 
+}
+
+.remote-cursor {
+    position: absolute;
+    background-color: #ffcc00; 
+    width: 2px;
+    height: 100%;
+}
+  
+.cursor-username {
+    font-size: 12px;
+    background-color: #ffcc00; 
+    padding: 2px;
+    color: white;
+}
+
+.btn.btn-info.btn-lg{
+    background-color: #ffcc00;
+    border: 1px black;
+}
+
+body{
+    background-color: white;
+    text-align: center;
+}
