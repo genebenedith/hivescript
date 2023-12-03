@@ -1,2 +1,22 @@
-.cm-editor { height: 300px; border: 1px solid #ddd}
-.cm-scroller { overflow: auto; }
+.cm-editor { 
+    height: 300px; 
+    border: 1px solid #ddd
+}
+
+.cm-scroller { 
+    overflow: auto; 
+}
+
+.remote-cursor {
+    position: absolute;
+    background-color: #ffcc00; 
+    width: 2px;
+    height: 100%;
+}
+  
+.cursor-username {
+    font-size: 12px;
+    background-color: #ffcc00; 
+    padding: 2px;
+    color: white;
+}
