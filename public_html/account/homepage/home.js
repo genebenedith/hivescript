@@ -3,27 +3,28 @@ const welcomeMessage = document.getElementById('welcomeMessage');
 welcomeMessage.textContent = `${username.slice(0,1).toUpperCase()}${username.slice(1).toLowerCase()}'s Projects`;
 
 document.addEventListener('DOMContentLoaded', () => {
-    fetchUserProjects();
+    updateNotificationBadge();
+    fetchOwnedProjects();
+    fetchSharedProjects();
 
     // Add an event listener for the "Create New Project" card
     const createNewProjectCard = document.getElementById("createNewProjectCard");
     createNewProjectCard.addEventListener("click", createNewProject);
 });
 
-function fetchUserProjects() {
-    const username = getUsername();
-
-    fetch(`/user/${username}/projects`)
+function updateNotificationBadge(){
+    fetch(`/user/${username}/update-notification-badge/`)
         .then(response => response.json())
-        .then(projects => {
-            // Display the fetched projects
-            displayUserProjects(projects);
+        .then(count => {
+            console.log(`Fetched number of unread notifications:, ${count.unreadNotificationCount}`);
+            // Update the badge value in the HTML
+            document.querySelector('.notificationButton__badge').innerText = count.unreadNotificationCount;
         })
-        .catch(error => console.error('Error fetching user projects:', error));
+        .catch(error => console.error('Error updating notification badge:', error));
 }
 
-function displayUserProjects(projects) {
-    const projectContainer = document.getElementById('projectContainer');
+function displayProjects(projects, containerId) {
+    const projectContainer = document.getElementById(containerId);
 
     projects.forEach(project => {
         const projectCard = createProjectCard(project);
@@ -31,48 +32,30 @@ function displayUserProjects(projects) {
     });
 }
 
-function getUsername() {
-    const cookie = document.cookie;
-    const cookiePairs = cookie.split('; ');
+function fetchOwnedProjects() {
+    const username = getUsername();
 
-    let username = '';
-
-    for (const cookiePair of cookiePairs) {
-        const [name, value] = cookiePair.split('=');
-        if (name === 'login') {
-            const encodedData = decodeURIComponent(value);
-            
-            const jsonStart = encodedData.indexOf('{');
-            const jsonData = encodedData.substring(jsonStart);
-
-            const data = JSON.parse(jsonData);
-
-            username = data.username;
-            return username;
-        }
-    }
+    fetch(`/user/${username}/projects/owned`)
+        .then(response => response.json())
+        .then(projects => {
+            console.log('Fetched owned projects:', projects);
+            // Display the fetched projects in the owned container
+            displayProjects(projects, 'ownedProjects');
+        })
+        .catch(error => console.error('Error fetching owned projects:', error));
 }
 
-function getFirstName() {
-    const cookie = document.cookie;
-    const cookiePairs = cookie.split('; ');
+function fetchSharedProjects() {
+    const username = getUsername();
 
-    let firstName = '';
-
-    for (const cookiePair of cookiePairs) {
-        const [name, value] = cookiePair.split('=');
-        if (name === 'login') {
-            const encodedData = decodeURIComponent(value);
-            
-            const jsonStart = encodedData.indexOf('{');
-            const jsonData = encodedData.substring(jsonStart);
-
-            const data = JSON.parse(jsonData);
-
-            firstName = data.firstName;
-            return firstName;
-        }
-    }
+    fetch(`/user/${username}/projects/shared`)
+        .then(response => response.json())
+        .then(projects => {
+            console.log('Fetched shared projects:', projects);
+            // Display the fetched projects in the shared container
+            displayProjects(projects, 'sharedProjects');
+        })
+        .catch(error => console.error('Error fetching shared projects:', error));
 }
 
 function createProjectCard(project) {
@@ -198,10 +181,54 @@ function createNewProject() {
         .then(newProject => {
             // Create and append the new project card
             const projectCard = createProjectCard(newProject);
-            const projectContainer = document.getElementById('projectContainer');
+            const projectContainer = document.getElementById('ownedProjects');
             projectContainer.appendChild(projectCard);
         })
         .catch(error => console.error('Error creating a new project:', error));
+}
+
+function getUsername() {
+    const cookie = document.cookie;
+    const cookiePairs = cookie.split('; ');
+
+    let username = '';
+
+    for (const cookiePair of cookiePairs) {
+        const [name, value] = cookiePair.split('=');
+        if (name === 'login') {
+            const encodedData = decodeURIComponent(value);
+            
+            const jsonStart = encodedData.indexOf('{');
+            const jsonData = encodedData.substring(jsonStart);
+
+            const data = JSON.parse(jsonData);
+
+            username = data.username;
+            return username;
+        }
+    }
+}
+
+function getFirstName() {
+    const cookie = document.cookie;
+    const cookiePairs = cookie.split('; ');
+
+    let firstName = '';
+
+    for (const cookiePair of cookiePairs) {
+        const [name, value] = cookiePair.split('=');
+        if (name === 'login') {
+            const encodedData = decodeURIComponent(value);
+            
+            const jsonStart = encodedData.indexOf('{');
+            const jsonData = encodedData.substring(jsonStart);
+
+            const data = JSON.parse(jsonData);
+
+            firstName = data.firstName;
+            return firstName;
+        }
+    }
 }
 
 function openNav() {
