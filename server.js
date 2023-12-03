@@ -6,6 +6,9 @@ const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
 const uuid = require('uuid');
+const WebSocket = require('ws')
+const wss = new WebSocket.Server({ noServer: true })
+// const setupWSConnection = require('./utils.js').setupWSConnection
 
 const port = 80; 
 const hostname = 'localhost'; // For now 
@@ -30,6 +33,7 @@ const userSchema = new mongoose.Schema({
     dateJoined: String,
     lastActivity: Date,
     notifications: Array,
+    unreadNotifications: String,
     hash: String, // Hashing of password 
     salt: String, // Randomized salt 
     owned: [], // Array of projects the user owns
@@ -40,17 +44,14 @@ const User = mongoose.model('User', userSchema);
 
 // Notification Schema
 const notificationSchema = new mongoose.Schema({
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User', // Reference to the User model
+    reciever: {
+      type: String // Username that notification belongs to 
     },
     type: {
       type: String, // Notification type (e.g., 'new document shared', 'new document update', etc.)
-      required: true,
     },
     message: {
       type: String, // Notification message 
-      required: true,
     },
     timestamp: {
       type: Date,
@@ -68,7 +69,8 @@ const projectSchema = new mongoose.Schema({
     projectId: String,
     queenBee: String, // the owner of the project
     workingBees: Array, // the invited participants to the project
-    projectTitle: String // Title of the project
+    projectTitle: String, // Title of the project
+    editorState: Object
 });
 
 const Project = mongoose.model('Project', projectSchema); 
@@ -116,7 +118,6 @@ app.use((error, req, res, next) => {
 function authenticate(req, res, next) {
     let c = req.cookies;
     console.log('auth request');
-    // console.log(c);
     console.log(sessions);
     if (c != undefined && c.login && c.login.username) {
         if (sessions[c.login.username] != undefined && sessions[c.login.username].id == c.login.sessionID) {
@@ -271,7 +272,54 @@ app.get('/project/:projectId', authenticate, async (req, res) => {
     }
 });
 
-app.get('/user/:username/projects', authenticate, async (req, res) => {
+app.post('/project/:projectId/save-state', async (req, res) => {
+    const projectId = req.params.projectId;
+    const { editorState } = req.body;
+
+    try {
+        const project = await Project.findOne({ projectId }).exec();
+
+        if (!project) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        // Update the editor state in the project document
+        project.editorState = editorState;
+        await project.save();
+
+        res.status(200).send("Editor state saved successfully.");
+    } catch (error) {
+        console.error("Error saving editor state:", error);
+        res.status(500).send("Error saving editor state.");
+    }
+});
+
+app.get('/project/load-state/:projectId', async (req, res) => {
+    const projectId = req.params.projectId;
+
+    try {
+        const project = await Project.findOne({ projectId }).exec();
+
+        if (!project) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        // Return the editor state as JSON
+        res.status(200).json({
+            editorState: project.editorState,
+        });
+    } catch (error) {
+        console.error("Error loading editor state:", error);
+        res.status(500).send("Error loading editor state.");
+    }
+});
+
+// Handle request to get projects owned by user
+app.get('/user/:username/projects/owned', authenticate, async (req, res) => {
     const username = req.params.username;
 
     try {
@@ -297,9 +345,75 @@ app.get('/user/:username/projects', authenticate, async (req, res) => {
     }
 });
 
-// POST Requests 
-// ------------------------------------------------------------------------------------------------------------
+// Handle request to get projects shared with user
+app.get('/user/:username/projects/shared', authenticate, async (req, res) => {
+    const username = req.params.username;
 
+    try {
+        const user = await User.findOne({ username: username }).exec();
+        if (!user) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        // Fetch the projects shared with the user
+        const projects = await Project.find({ workingBees: { $in: [username] } }).exec();
+
+        // Map the projects to include only relevant information (projectId and projectTitle)
+        const mappedProjects = projects.map(project => ({
+            projectId: project.projectId,
+            projectTitle: project.projectTitle
+        }));
+
+        res.json(mappedProjects);
+    } catch (error) {
+        console.error('Error fetching shared projects:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// Handle request to get notification count and update notification badge on homepage
+app.get('/user/:username/update-notification-badge', authenticate, async (req, res) => {
+    const username = req.params.username;
+    console.log(username);
+
+    try {
+        const user = await User.findOne({ username }).exec();
+
+        if (!user) {
+            res.status(404).send('User not found');
+            return;
+        }
+
+        let unreadNotificationCount = 0;
+
+        // Loop through the notifications array and count unread notifications
+        for (let i = 0; i < user.notifications.length; i++) {
+            const notificationId = user.notifications[i];
+            const notification = await Notification.findById(notificationId).exec();
+    
+            if (notification && !notification.isRead) {
+                unreadNotificationCount++;
+            }
+        }
+
+        console.log(unreadNotificationCount);
+
+        user.unreadNotifications = unreadNotificationCount.toString();
+        await user.save();
+
+        // Send count to client
+        res.status(200).json({ unreadNotificationCount });
+
+    } catch (error) {
+        console.error('Error updating notification badge:', error);
+        res.status(500).send('Internal Server Error');
+    }
+});
+
+// POST Requests ------------------------------------------------------------------------------------------------------------
+
+// Handle request to log into existing user account
 app.post('/login', (req, res) => {
     let userData = req.body;
     let user = User.find({username: userData.username}).exec();
@@ -334,6 +448,7 @@ app.post('/login', (req, res) => {
     });
 })
 
+// Handle request to create new user account
 app.post('/register', (req, res) => {
     let userData = req.body;
     let person = User.find({username: { $regex: userData.username, $options: "i" }}).exec();
@@ -349,7 +464,7 @@ app.post('/register', (req, res) => {
             console.log(toHash);
             console.log(result);
 
-            const month = ["January","February","March","April","May","June","July","August","September","October","November","December"];
+            const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 
             const d = new Date();
             let monthJoined = month[d.getUTCMonth()];
@@ -386,6 +501,7 @@ app.post('/register', (req, res) => {
     
 })
 
+// Handle request to log out and end session
 app.post('/logout', (req, res) => {
     const username = req.body.username;
     if (username) {
@@ -399,6 +515,7 @@ app.post('/logout', (req, res) => {
     }
 });
 
+// Handle request to create project
 app.post('/project/create', async (req, res) => {
     console.log('Received data:', req.body);
     const userData = req.body;
@@ -419,7 +536,8 @@ app.post('/project/create', async (req, res) => {
             projectId: newProjectId,
             queenBee: userData.username,
             workingBees: [],
-            projectTitle: "New Project" // Provide a default title
+            projectTitle: "New Project", // Provide a default title
+            editorState: null, 
         });
 
         await newProject.save();
@@ -489,6 +607,83 @@ app.post('/project/:projectId/delete', async (req, res) => {
         res.status(500).send("Error deleting project.");
     }
 });
+
+// Handle request to invite a user to the project
+async function createNotification(username, type, message) {
+    try {
+        const notification = new Notification({
+            receiver: username,
+            type: type,
+            message: message,
+        });
+
+        await notification.save();
+
+        return notification._id; // Return the ID of the created notification
+    } catch (error) {
+        console.error("Error creating notification:", error);
+        throw error;
+    }
+}
+
+app.post('/project/:projectId/invite-user', async (req, res) => {
+    const projectId = req.params.projectId;
+    const inviteeUsername = req.body.invitee;
+    const inviterUsername = req.body.inviter; 
+
+    try {
+        const project = await Project.findOne({ projectId }).exec();
+
+        if (!project) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        const inviteeUser = await User.findOne({ username: inviteeUsername }).exec();
+
+        if (!inviteeUser) {
+            console.log("User not found.");
+            res.status(400).send("User not found.");
+            return;
+        }
+
+        const inviterUser = await User.findOne({ username: inviterUsername }).exec();
+
+        if (!inviterUser) {
+            console.log("Inviter not found.");
+            res.status(400).send("Inviter not found.");
+            return;
+        }
+
+        // Customize the notification message
+        const message = `${inviterUser.firstName} ${inviterUser.lastName} (@${inviterUser.username}) has invited you to collaborate on a new project!`;
+
+        // Create a notification for the invitee
+        const notificationId = await createNotification(inviteeUsername, 'New document shared! 🎉', message);
+
+        // Add the notification ID to the invitee's notifications array
+        inviteeUser.notifications.push(notificationId);
+        await inviteeUser.save();
+
+        // Add the project ID to the invitee's shared array
+        inviteeUser.shared.push(project._id);
+        await inviteeUser.save();
+
+        // Add the invitee username to the project's workingBees array
+        project.workingBees.push(inviteeUsername);
+        await project.save();
+
+        res.status(200).send("User invited successfully.");
+    } catch (error) {
+        console.error("Error inviting user:", error);
+        res.status(500).send("Error inviting user.");
+    }
+});
+
+
+
+
 
 app.listen(port, async () => {
     console.log(`Server is running at http://${hostname}:${port}`);
