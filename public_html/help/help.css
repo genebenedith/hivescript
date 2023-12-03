@@ -15,42 +15,25 @@ body{
 }
 
 
-
-
 header {
-    background-color: #ffd700;
-    text-align: center;
-    padding: 20px 0;
-    position: fixed;
-    top: 0;
-    width: 100%;
-  }
-  
-nav ul {
-    list-style: none;
+    color: #fff; 
+    display: flex;
+    align-items: center;
 }
-  
-nav ul li {
-    display: inline;
-    margin-right: 20px;
+
+.logo img {
+    width: 280px; 
+    height: auto; 
+
 }
-  
-nav ul li a {
-    text-decoration: none;
-    color: #333;
-    font-weight: bold;
-    text-align: left;
+
+.logo {
+    margin-right: 5px;
+    margin-bottom: 400px;
+    
 }
-  
-nav ul li a:hover {
-    color: #555;
-}
-  
-header h1 {
-    font-size: 2em;
-    color: #333;
-}
-  
+
+
 footer {
     text-align: center;
     background-color: #ffd700;
@@ -82,24 +65,14 @@ footer nav ul li a:hover {
     color: #555;
 }
 
-
-
-
-
-
-
-
-
-
-
-
 .container{
     margin:0 auto;
-    max-width: 800px;
+    max-width: 900px;
     display: flex;
     flex-direction: column;
     gap: 20px;
-    padding: 20px;
+    padding: 15px;
+    max-height: 800px;
 }
 
 .container h1{
@@ -126,7 +99,6 @@ footer nav ul li a:hover {
 }
 
 .container .tab label::after{
-    content: '+';
     position: absolute;
     right: 20px;
     font-size: 2em;
@@ -137,7 +109,7 @@ footer nav ul li a:hover {
 
 
 .container .tab input:checked ~ label::after{
-    transform: rotate(135deg);
+    transform: rotate(0deg);
     color: #f5f5f5;
 }
 
@@ -184,9 +156,6 @@ footer nav ul li a:hover {
 .container .tab:nth-child(7) label h2{
     background: rgb(248, 242, 81);
 }
-.container .tab:nth-child(8) label h2{
-    background: rgb(248, 242, 81);
-}
 
 .container .tab label h3{
     position: relative;
@@ -197,12 +166,14 @@ footer nav ul li a:hover {
 
 .container .tab .content{
     max-height: 0;
-    transition: 1s;
     overflow: hidden;
+    transition: max-height 0.5s ease-out;
+    position: relative;
 }
 
 .container .tab input:checked ~ .content{
-    max-height: 100vh;
+    max-height: 0;
+    overflow: hidden;
 
 }
 .container .tab .content p{
@@ -210,4 +181,8 @@ footer nav ul li a:hover {
     padding: 10px 0;
     color: #080808;
     z-index: 10;
+}
+
+.container .tab input[type="radio"]:checked ~ .content {
+    max-height: 100vh;
 }
