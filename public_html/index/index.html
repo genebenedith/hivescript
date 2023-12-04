@@ -5,70 +5,49 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login: HiveScript</title>
     <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/index/index.css">
-    
     <link rel="icon" href="/public_html/img/hivescript_new_logo.png">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+
 </head>
 
 <body>
     <div id="bodyContainer">
-        <img src="/public_html/img/hivescript_new_logo.png" alt="hive script logo">
+        <div id="containBoth">
+          <div id="contain-login" class="eachContainer">
+            <div class="contain-login-ACTIVE">
+            <div id="title"><br><br>Login</div>
+            <div id="login-imgContain"></div>
+            <form id="login-form">
+              <input type="text" id="username" class="indexTextInput" name="username" placeholder='Username'><br>
+              <input type="text" id="password" class="indexTextInput" name="password" placeholder="Password"><br>
+            </form>
+            <div id="login-switchText1"></div>
+            <div id="login-switchText2"></div>
 
-        <div id="contain-login">
-        <h1>
-            Login 
-        </h1> 
-        <form>
-            <table>
-                <tr>
-                <th>
-                <label for="username" class="indexLabel">Username:</label>
-                </th>
-                <th>
-                <input type="text" id="username" class="indexTextInput" name="username">
-                </th>
-                </tr>
-                <tr>
-                <th>
-                <label for="password" class="indexLabel">Password:</label>
-                </th>
-                <th>
-                <input type="text" id="password" class="indexTextInput" name="password">
-                </th>
-                </tr>
-            </table>
-            <input type="submit" class="indexPageButton" id="loginButton" value="Login">
-          </form>
-      </div>  <!-- end of id="contain-login" -->
-      
-
-      <div id="contain-createUser">
-        <h1>
-            Create Account
-        </h1>
-        <form>
-            <table>
-                <tr>
-                <th>
-                <label for="newUsername" class="indexLabel">Username:</label>
-                </th>
-                <th>
-                <input type="text" id="newUsername" class="indexTextInput" name="username">
-                </th>
-                </tr>
-                <tr>
-                <th>
-                <label for="newPassword" class="indexLabel">Password:</label>
-                </th>
-                <th>
-                <input type="text" id="newPassword" class="indexTextInput" name="password">
-                </th>
-                </tr>
-            </table>
-            <input type="submit" class="indexPageButton" id="createAccountButton" value="Create Account">
-          </form>
-      </div>  <!-- end of id="contain-createUser" -->
-    </div>  <!-- end of id="bodyContainer" -->
-
+            <div id="login-buttonContain">
+                <button class="indexPageButton-SWITCH" id="loginButton">Log in</button>
+            </div>
+          </div>
+          </div>
+          
+          <div id="contain-createUser" class="eachContainer">
+            <div class="contain-createUser-INACTIVE"> 
+              <div id="createTitle"></div>
+              <form id="create-form"></form>
+              <div id="create-imgContain">
+                <img src="/public_html/img/hivescript_new_logo.png" alt="logo">
+              </div>
+              <div id="create-switchText1"><h2>Welcome to HiveScript.</h2></div>
+              <div id="create-switchText2"><h3>New here?</h3></div>
+              <div id="create-buttonContain">
+                <button class="indexPageButton-SWITCH" id="createAccountButton">Create Account</button>
+              </div>
+            </div>
+          </div>
+          </div>  
+        </div>
+  
     <script src="/public_html/index/index.js"></script>
+
 </body>
-</html>
+</html> 
