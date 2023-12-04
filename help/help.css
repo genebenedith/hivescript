@@ -1,0 +1,172 @@
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing: border-box;
+    font-family: 'Garamond', serif;
+}
+
+body{
+    display:flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    background: #f5f5f5;
+}
+
+
+header {
+    color: #fff; 
+    display: flex;
+    align-items: center;
+}
+
+.logo img {
+    width: 280px; 
+    height: auto; 
+
+}
+
+.logo {
+    margin-right: 5px;
+    margin-bottom: 400px;
+    
+}
+
+
+.container{
+    margin:0 auto;
+    max-width: 900px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 15px;
+    max-height: 800px;
+}
+
+.container h1{
+    color:#080808;
+}
+
+.container .tab{
+    position: relative;
+    background: #f5f5f5;
+    padding: 0 20px 20px;
+    box-shadow: 0 15px 25px #080808;
+    border-radius: 5px;
+    overflow: hidden;
+}
+
+.container .tab input{
+    appearance: none;
+}
+
+.container .tab label{
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+}
+
+.container .tab label::after{
+    position: absolute;
+    right: 20px;
+    font-size: 2em;
+    color: #080808;
+    transition: transform 1s;
+}
+
+.container .tab input:checked ~ label::after{
+    transform: rotate(0deg);
+    color: #f5f5f5;
+}
+
+.container .tab label h2{
+    width: 40px;
+    height: 40px;
+    display: flex;
+    justify-content: center;
+    color: #f5f5f5;
+    font-size: 1.25em;
+    border-radius: 5px;
+    margin-right: 10px;
+}
+
+.container .tab input:checked ~ label h2{
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    color: #f7f0f0;
+    font-size: 8em;
+    justify-content: flex-end;
+    padding: 20px;
+
+}
+
+.container .tab:nth-child(2) label h2{
+    background: rgb(248, 242, 81);
+}
+.container .tab:nth-child(3) label h2{
+    background: rgb(248, 242, 81);
+}
+.container .tab:nth-child(4) label h2{
+    background: rgb(248, 242, 81);
+}
+.container .tab:nth-child(5) label h2{
+    background: rgb(248, 242, 81);
+}
+.container .tab:nth-child(6) label h2{
+    background: rgb(248, 242, 81);
+}
+
+.container .tab:nth-child(7) label h2{
+    background: rgb(248, 242, 81);
+}
+
+.container .tab label h3{
+    position: relative;
+    font-weight: 500;
+    color: #080808;
+    z-index: 10;
+}
+
+.container .tab .content{
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s ease-out;
+    position: relative;
+}
+
+.container .tab input:checked ~ .content{
+    max-height: 0;
+    overflow: hidden;
+
+}
+.container .tab .content p{
+    position: relative;
+    padding: 10px 0;
+    color: #080808;
+    z-index: 10;
+}
+
+.container .tab input[type="radio"]:checked ~ .content {
+    max-height: 100vh;
+}
+
+.back-button {
+    position: fixed;
+    bottom: 20px;
+    left: 90px;
+    padding: 10px 20px;
+    background-color: rgb(248, 242, 81); 
+    color: #080808;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000; 
+  }
+  
+  .back-button:hover {
+    background-color: #e0d100; 
+  }
