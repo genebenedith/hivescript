@@ -34,37 +34,6 @@ header {
 }
 
 
-footer {
-    text-align: center;
-    background-color: #ffd700;
-    padding: 10px 0;
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-}
-  
-footer p {
-    margin-bottom: 5px;
-}
-  
-footer nav ul {
-    padding: 0;
-}
-  
-footer nav ul li {
-    display: inline;
-    margin-right: 20px;
-}
-  
-footer nav ul li a {
-    text-decoration: none;
-    color: #333;
-}
-  
-footer nav ul li a:hover {
-    color: #555;
-}
-
 .container{
     margin:0 auto;
     max-width: 900px;
@@ -105,8 +74,6 @@ footer nav ul li a:hover {
     color: #080808;
     transition: transform 1s;
 }
-
-
 
 .container .tab input:checked ~ label::after{
     transform: rotate(0deg);
@@ -186,3 +153,20 @@ footer nav ul li a:hover {
 .container .tab input[type="radio"]:checked ~ .content {
     max-height: 100vh;
 }
+
+.back-button {
+    position: fixed;
+    bottom: 20px;
+    left: 90px;
+    padding: 10px 20px;
+    background-color: rgb(248, 242, 81); 
+    color: #080808;
+    text-decoration: none;
+    border-radius: 5px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    z-index: 1000; 
+  }
+  
+  .back-button:hover {
+    background-color: #e0d100; 
+  }
