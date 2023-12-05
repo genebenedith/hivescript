@@ -4,8 +4,8 @@ const username = getUsername();
 
 const currentUser = {
     id: "current",
-    // label: `${displayName}`,
-    label: "",
+    label: `${displayName}`,
+    // label: "",
     color: getRandomColor()
 };
 
@@ -22,7 +22,6 @@ ws.addEventListener('message', (event) => {
     // Example: Update the target user's label
     currentUser.label = message.label;
 
-    // Update your UI or perform other actions based on the incoming message
 });
 
 async function main() {
