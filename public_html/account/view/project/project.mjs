@@ -2,31 +2,34 @@ const projectId = document.body.dataset.projectId;
 const inviteUserButton = document.getElementById("inviteUser");
 const username = getUsername();
 
-const currentUser = {
-    id: "current",
-    label: `${displayName}`,
-    // label: "",
-    color: getRandomColor()
-};
 
-const ws = new WebSocket(`ws://${window.location.host}`);
 
-ws.addEventListener('open', (event) => {
-    console.log('WebSocket connection opened.');
-});
+// const ws = new WebSocket(`ws://${window.location.host}`);
 
-ws.addEventListener('message', (event) => {
-    // Handle incoming messages (live updates) from the server
-    const message = JSON.parse(event.data);
+// ws.addEventListener('open', (event) => {
+//     console.log('WebSocket connection opened.');
+// });
 
-    // Example: Update the target user's label
-    currentUser.label = message.label;
+// ws.addEventListener('message', (event) => {
+//     // Handle incoming messages (live updates) from the server
+//     const message = JSON.parse(event.data);
 
-});
+//     // Example: Update the target user's label
+//     currentUser.label = message.label;
+
+//     // Update your UI or perform other actions based on the incoming message
+// });
 
 async function main() {
     const info = await getUserInfo(); 
     const displayName = info.displayName;
+    
+    const currentUser = {
+        id: "current",
+        label: `${displayName}`,
+        // label: "",
+        color: getRandomColor()
+    };
     
     const editorContents = await fetchEditorContents();
 
