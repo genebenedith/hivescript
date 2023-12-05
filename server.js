@@ -7,11 +7,31 @@ const crypto = require('crypto');
 const path = require('path');
 const uuid = require('uuid');
 const WebSocket = require('ws')
-const wss = new WebSocket.Server({ noServer: true })
-// const setupWSConnection = require('./utils.js').setupWSConnection
+
 
 const port = 80; 
 const hostname = 'localhost'; // For now 
+
+const app = express();
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
+
+wss.on('connection', (ws) => {
+    // Handle new WebSocket connections
+    console.log('WebSocket connection established.');
+    
+    // Listen for messages from clients
+    ws.on('message', (message) => {
+        console.log(`Received message: ${message}`);
+
+        // Broadcast the message to all connected clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    });
+});
 
 // Define the MongoDB connection string
 const mongoDBURL = "mongodb+srv://gbenedith:k0HWPrO07X9Cki1l@hivescript.owmolsx.mongodb.net/hivescript?retryWrites=true&w=majority";
@@ -70,10 +90,11 @@ const projectSchema = new mongoose.Schema({
     queenBee: String, // the owner of the project
     workingBees: Array, // the invited participants to the project
     projectTitle: String, // Title of the project
-    editorState: Object
+    editorContents: String
 });
 
 const Project = mongoose.model('Project', projectSchema); 
+const editorContents = defaultEditorContents();
 
 let sessions = {};
 
@@ -100,7 +121,7 @@ setInterval(removeSessions, 5000);
 
 // ------------------------------------------------------------------------------------------------------------
 
-const app = express();
+
 app.use(cookieParser());
 app.use(express.json());
 app.set('views', path.join(__dirname, 'public_html/account/view'));
@@ -199,8 +220,6 @@ app.get('/public_html/account/view/profile/profile.js', (req, res) => {
 
 // Serve the Profile EJS file
 app.get('/profile/:username', authenticate, async (req, res) => {
-    console.log("here");
-    console.log("cake");
     const username = req.params.username;
     const tab = req.query.tab || 'profile';
     
@@ -234,10 +253,92 @@ app.get('/public_html/account/view/project/project.css', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/view/project/project.css');
 });
 
-// // Serve the Help JS file
-// app.get('/help.js', (req, res) => {
-//     res.sendFile(__dirname + '/help/help.js');
-// });
+// Serve the ACE files
+app.get('/public_html/account/view/project/ace-collab-ext.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/ace-collab-ext.css');
+});
+
+app.get('/node_modules/ace-builds/src-min/ace.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/ace.js');
+});
+
+app.get('/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js');
+});
+
+app.get('/public_html/account/view/project/editor_contents.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/editor_contents.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/mode-javascript.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/mode-javascript.js');
+});
+
+app.get('/public_html/account/view/project/editor_contents.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/editor_contents.js');
+});
+
+// Handle requests for 7 dark themes 
+app.get('/node_modules/ace-builds/src-min/theme-monokai.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-monokai.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-dracula.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-dracula.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-merbivore.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-merbivore.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-clouds_midnight.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-clouds_midnight.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-pastel_on_dark.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-pastel_on_dark.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-tomorrow_night.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-tomorrow_night.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-ambiance.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-ambiance.js');
+});
+
+// Handle requests for 7 light themes 
+app.get('/node_modules/ace-builds/src-min/theme-tomorrow.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-tomorrow.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-github.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-github.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-chrome.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-chrome.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-dawn.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-dawn.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-textmate.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-textmate.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-eclipse.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-eclipse.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-xcode.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-xcode.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/worker-javascript.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/worker-javascript.js');
+});
 
 // Serve the Help HTML file
 app.get('/help', (req, res) => {
@@ -256,7 +357,10 @@ app.get('/public_html/img/hivescript_new_logo.png', (req, res) => {
 
 app.get('/project/:projectId', authenticate, async (req, res) => {
     const projectId = req.params.projectId;
-    
+    // console.log(JSON.stringify(req.headers.username));
+    // const username = req.params.username;
+    // console.log(username);
+    // console.log('username printed above');
     try {
         const project = await Project.findOne({ projectId: projectId }).exec();
         if (!project) {
@@ -272,31 +376,7 @@ app.get('/project/:projectId', authenticate, async (req, res) => {
     }
 });
 
-app.post('/project/:projectId/save-state', async (req, res) => {
-    const projectId = req.params.projectId;
-    const { editorState } = req.body;
-
-    try {
-        const project = await Project.findOne({ projectId }).exec();
-
-        if (!project) {
-            console.log("Project not found.");
-            res.status(404).send("Project not found.");
-            return;
-        }
-
-        // Update the editor state in the project document
-        project.editorState = editorState;
-        await project.save();
-
-        res.status(200).send("Editor state saved successfully.");
-    } catch (error) {
-        console.error("Error saving editor state:", error);
-        res.status(500).send("Error saving editor state.");
-    }
-});
-
-app.get('/project/load-state/:projectId', async (req, res) => {
+app.get('/project/:projectId/load-contents', async (req, res) => {
     const projectId = req.params.projectId;
 
     try {
@@ -310,11 +390,31 @@ app.get('/project/load-state/:projectId', async (req, res) => {
 
         // Return the editor state as JSON
         res.status(200).json({
-            editorState: project.editorState,
+            editorContents: project.editorContents,
         });
     } catch (error) {
-        console.error("Error loading editor state:", error);
-        res.status(500).send("Error loading editor state.");
+        console.error("Error loading editor contents:", error);
+        res.status(500).send("Error loading editor contents.");
+    }
+});
+
+// Handle request to get user information
+app.get('/user/:username', async (req, res) => {
+    const username = req.params.username;
+
+    try {
+        const user = await User.findOne({ username: username }).exec();
+        if (!user) {
+            // Handle case where user with the specified username is not found
+            res.status(404).json({ error: 'User not found' });
+        } else {
+            console.log({ user: user })
+            // Return the user information as JSON
+            res.status(200).send({ user: user });
+        }
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
@@ -537,7 +637,7 @@ app.post('/project/create', async (req, res) => {
             queenBee: userData.username,
             workingBees: [],
             projectTitle: "New Project", // Provide a default title
-            editorState: null, 
+            editorContents: editorContents, 
         });
 
         await newProject.save();
@@ -607,6 +707,34 @@ app.post('/project/:projectId/delete', async (req, res) => {
         res.status(500).send("Error deleting project.");
     }
 });
+
+app.post('/project/:projectId/save-contents', async (req, res) => {
+    const projectId = req.params.projectId;
+    const editorContents = req.body.editorContents;
+
+    try {
+        const project = await Project.findOne({ projectId }).exec();
+
+        if (!project) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        // Update the editor state in the project document
+        project.editorContents = editorContents;
+        const savedProject = await project.save();
+
+        console.log("Editor contents saved successfully.");
+        console.log("Project editor contents updated: " + savedProject);
+        res.status(200).send("Editor contents saved successfully.");
+    } catch (error) {
+        console.log("Issue saving editor contents.");
+        console.error(error);
+        res.status(500).send("Issue saving editor contents.");
+    }
+});
+
 
 // Handle request to invite a user to the project
 async function createNotification(username, type, message) {
@@ -682,7 +810,100 @@ app.post('/project/:projectId/invite-user', async (req, res) => {
 });
 
 
+function defaultEditorContents(){
+    const contents = `// Start coding here
+function greet(name) {
+    console.log("Hello, " + name + "!");
+}
 
+function addNumbers(a, b) {
+    return a + b;
+}
+
+var fruits = ['apple', 'banana', 'orange'];
+
+for (var i = 0; i < fruits.length; i++) {
+    console.log("I like " + fruits[i] + "s.");
+}
+
+// Uncomment the line below to see the greeting
+// greet('John');
+
+// Uncomment the line below to see the result of adding two numbers
+// var sum = addNumbers(5, 7);
+// console.log("The sum is: " + sum);
+
+function square(x) {
+    return x * x;
+}
+
+function displaySquare(value) {
+    console.log("The square of " + value + " is: " + square(value));
+}
+
+// Uncomment the line below to display the square of a number
+// displaySquare(4);
+
+// Creating an object
+var person = {
+    name: 'Alice',
+    age: 30,
+    profession: 'Engineer'
+};
+
+console.log(person.name + " is " + person.age + " years old and works as an " + person.profession + ".");
+
+function multiplyByTwo(num) {
+    return num * 2;
+}
+
+var randomNum = Math.floor(Math.random() * 100);
+console.log("A random number: " + randomNum);
+
+function printNumbers(count) {
+    for (var k = 1; k <= count; k++) {
+        console.log(k);
+    }
+}
+
+for (var j = 0; j < 5; j++) {
+    console.log("Iteration " + (j + 1) + " of the loop.");
+}
+var colors = ['red', 'blue', 'green'];
+
+// Loop to display colors
+for (var color of colors) {
+    console.log("Color: " + color);
+}
+
+// Function to check if a number is even
+function isEven(number) {
+    return number % 2 === 0;
+}
+
+// Creating an array of objects
+var students = [
+    { name: 'John', age: 25, grade: 'A' },
+    { name: 'Emily', age: 22, grade: 'B' },
+    { name: 'Mike', age: 24, grade: 'A-' }
+];
+
+// Loop to display information about students
+for (var student of students) {
+    console.log(student.name + " is " + student.age + " years old and received a grade of " + student.grade + ".");
+}
+
+// Function to calculate the factorial of a number
+function factorial(n) {
+    if (n === 0 || n === 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+    `
+    return contents;
+}
 
 
 app.listen(port, async () => {

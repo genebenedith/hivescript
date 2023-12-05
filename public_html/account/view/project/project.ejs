@@ -11,52 +11,64 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+    <!-- ACE Editor -->
+    <link rel="stylesheet" href="/public_html/account/view/project/ace-collab-ext.css"/>
+    <script src="/node_modules/ace-builds/src-min/ace.js"></script>
+    <script src="/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js" type="text/javascript" charset="utf-8"></script>
+    <script src="/public_html/account/view/project/editor_contents.js" type="text/javascript" charset="utf-8"></script>
 </head>
 <body data-project-id="<%= project.projectId %>">
-    <h1>Project Details</h1>
-    <p>Project ID: <%= project.projectId %></p>
-    <h2>CodeMirror!</h2>
-    <br>
-    <!-- Trigger the modal with a button -->
-    <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Invite User</button>
     
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" role="dialog">
-        <div class="modal-dialog">
-        
-        <!-- Modal content-->
-        <div class="modal-content">
-            <div class="modal-header">
-            <button type="button" class="close" data-dismiss="modal">&times;</button>
-            <h4 class="modal-title">Invite User</h4>
+    <div class="main-container">
+        <h1>Project Details</h1>
+        <p>Project ID: <%= project.projectId %></p>
+        <br>
+        <div class="title"><%= project.projectTitle %></div>
+        <!-- save button -->
+        <div class="save-button-container">
+          <button id="save-button">Save Editor</button>
+          <label for="themeSelect">Change Theme</label>
+          <select id="theme-selector">
+            <optgroup label="Light">
+                <!-- Light Themes Options -->
+                <option value="ace/theme/chrome">Chrome</option>
+                <option value="ace/theme/dawn">Dawn</option>
+                <option value="ace/theme/eclipse">Eclipse</option>
+                <option value="ace/theme/github">GitHub</option>
+                <option value="ace/theme/textmate">TextMate</option>
+                <option value="ace/theme/tomorrow">Tomorrow</option>
+                <option value="ace/theme/xcode">XCode</option>
+                
+            </optgroup>
+            <optgroup label="Dark">
+                <!-- Dark Themes Options -->
+                <option value="ace/theme/ambiance">Ambiance</option>
+                <option value="ace/theme/dracula">Dracula</option>
+                <option value="ace/theme/merbivore">Merbivore</option>
+                <option value="ace/theme/monokai" selected>Monokai</option>
+                <option value="ace/theme/pastel_on_dark">Pastel on Dark</option>
+                <option value="ace/theme/clouds_midnight">Clouds Midnight</option>
+                <option value="ace/theme/tomorrow_night">Tomorrow Night </option>
+              </optgroup>
+          </select>
+        </div>
+        <div class="editors">
+          <div class="editor-column">
+            <div class="editor-label">Target Editor</div>
+            <div class="wrapped-editor">
+              <div class="editor" id="target-editor" style="height: 100%; width: 100%;"></div>
+              <div class="radar-view" id="target-radar-view"></div>
             </div>
-            <div class="modal-body">
-            <form onsubmit="inviteUser(event)">
-                <label for="inviteeUsername">Enter the username:</label>
-                <input type="text" id="inviteeUsername" name="inviteeUsername" value=""><br><br>
-                <input type="submit" value="Invite User" id="inviteUser"><br><br>
-                <p id="inviteResponse"></p>
-            </form>
-            </div>
-            <div class="modal-footer">
-            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-            </div>
+          </div>
         </div>
         
-        </div>
-    </div>
-    <br>
-    <br>
-    <div id="editor"></div>
-
-    <input type="button" id="saveState" onclick="saveState()" value="Save State">
-    <br>
-    <br>
-    <select id="states"></select>
-    <input type="button" id="loadState" onclick="loadState()" value="Load State">
-    <br>
+      </div>
+    
     <script src="/public_html/account/view/project/codemirror/project.bundle.js"></script>
     <script type="module" src="/public_html/account/view/project/project.mjs"></script>
+    <script>
+        ace.config.setModuleUrl("ace/mode/javascript_worker", "/node_modules/ace-builds/src-min/worker-javascript.js");
+    </script>
     <!-- <script src="/public_html/account/view/project/project.js"></script> -->
 </body>
 </html>
