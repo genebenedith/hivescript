@@ -474,7 +474,7 @@ app.post('/register', (req, res) => {
             let newUser = new User({
                 username: userData.username,
                 firstName: userData.firstName,
-                lastName: userData.lastname,
+                lastName: userData.lastName,
                 displayName: userData.username,
                 dateJoined: dateJoined,
                 notifications: Array,
