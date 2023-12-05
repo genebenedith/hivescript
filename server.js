@@ -89,7 +89,7 @@ function removeSessions(username) {
     let usernames = Object.keys(sessions);
     for (let i = 0; i < usernames.length; i++) {
         let last = sessions[usernames[i]].time;
-        if (last + 120000 < now) {
+        if (last + 900000 < now) {
             delete sessions[usernames[i]]
         }
     }
