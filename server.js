@@ -7,11 +7,31 @@ const crypto = require('crypto');
 const path = require('path');
 const uuid = require('uuid');
 const WebSocket = require('ws')
-const wss = new WebSocket.Server({ noServer: true })
-// const setupWSConnection = require('./utils.js').setupWSConnection
+
 
 const port = 80; 
 const hostname = 'localhost'; // For now 
+
+const app = express();
+// const server = http.createServer(app);
+// const wss = new WebSocket.Server({ server });
+
+// wss.on('connection', (ws) => {
+//     // Handle new WebSocket connections
+//     console.log('WebSocket connection established.');
+    
+//     // Listen for messages from clients
+//     ws.on('message', (message) => {
+//         console.log(`Received message: ${message}`);
+
+//         // Broadcast the message to all connected clients
+//         wss.clients.forEach((client) => {
+//             if (client !== ws && client.readyState === WebSocket.OPEN) {
+//                 client.send(message);
+//             }
+//         });
+//     });
+// });
 
 // Define the MongoDB connection string
 const mongoDBURL = "mongodb+srv://gbenedith:k0HWPrO07X9Cki1l@hivescript.owmolsx.mongodb.net/hivescript?retryWrites=true&w=majority";
@@ -32,7 +52,10 @@ const userSchema = new mongoose.Schema({
     displayName: String,
     dateJoined: String,
     lastActivity: Date,
-    notifications: Array,
+    notifications: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Notification'
+      }], // Array of references to objects in Notification collection
     unreadNotifications: String,
     hash: String, // Hashing of password 
     salt: String, // Randomized salt 
@@ -47,11 +70,20 @@ const notificationSchema = new mongoose.Schema({
     reciever: {
       type: String // Username that notification belongs to 
     },
-    type: {
-      type: String, // Notification type (e.g., 'new document shared', 'new document update', etc.)
+    sender: {
+        type: String // Username that sent notification
     },
+    title: {
+      type: String, // Notification title (e.g., 'new document shared', 'new document update', etc.)
+    },
+    type: {
+        type: String, // Notification type (e.g., 'invite', 'update', etc.)
+      },
     message: {
-      type: String, // Notification message 
+        type: String, // Notification message (e.g., 'Jane Doe (@janedoe) has invited you to collaborate on a new project!')
+    },
+    projectID: {
+      type: String, // Project ID 
     },
     timestamp: {
       type: Date,
@@ -67,13 +99,14 @@ const Notification = mongoose.model('Notification', notificationSchema);
 
 const projectSchema = new mongoose.Schema({
     projectId: String,
-    queenBee: String, // the owner of the project
-    workingBees: Array, // the invited participants to the project
+    queenBee: String, // Owner of the project
+    workingBees: Array, // Invited participants to the project
     projectTitle: String, // Title of the project
-    editorState: Object
+    editorContents: String
 });
 
 const Project = mongoose.model('Project', projectSchema); 
+const editorContents = defaultEditorContents();
 
 let sessions = {};
 
@@ -100,7 +133,7 @@ setInterval(removeSessions, 5000);
 
 // ------------------------------------------------------------------------------------------------------------
 
-const app = express();
+
 app.use(cookieParser());
 app.use(express.json());
 app.set('views', path.join(__dirname, 'public_html/account/view'));
@@ -115,6 +148,7 @@ app.use((error, req, res, next) => {
     }
   });
 
+// Authenticate user with cookie sessions
 function authenticate(req, res, next) {
     let c = req.cookies;
     console.log('auth request');
@@ -128,7 +162,6 @@ function authenticate(req, res, next) {
     } else {
         res.redirect('/index');
     }
-    
 }
 
 app.use('/public_html/account', authenticate, express.static('public_html/account'));
@@ -137,7 +170,7 @@ app.use('/public_html/account', authenticate, express.static('public_html/accoun
 // app.use(authenticate);
 // app.use('/public_html', express.static('public_html'));
 
-// ------------------------------------------------------------------------------------------------------------
+// GET REQUESTS ------------------------------------------------------------------------------------------------------------
 
 
 // Serve the Server JS file 
@@ -145,6 +178,7 @@ app.get('/server.js', (req, res) => {
     res.sendFile(__dirname + '/server.js');
 });
 
+// Handle request for '/', leads to home.html if valid session, otherwise leads to index.html 
 app.get('/', (req, res) => {
     let c = req.cookies;
     if (c != undefined && c.login && c.login.username) {
@@ -199,13 +233,11 @@ app.get('/public_html/account/view/profile/profile.js', (req, res) => {
 
 // Serve the Profile EJS file
 app.get('/profile/:username', authenticate, async (req, res) => {
-    console.log("here");
-    console.log("cake");
     const username = req.params.username;
     const tab = req.query.tab || 'profile';
     
     try {
-        const user = await User.findOne({ username: username }).exec();
+        const user = await User.findOne({ username: username }).populate('notifications').exec();
         if (!user) {
             // Handle case where user with the specified username is not found
             res.status(404).send('User not found');
@@ -234,10 +266,92 @@ app.get('/public_html/account/view/project/project.css', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/view/project/project.css');
 });
 
-// // Serve the Help JS file
-// app.get('/help.js', (req, res) => {
-//     res.sendFile(__dirname + '/help/help.js');
-// });
+// Serve the ACE files
+app.get('/public_html/account/view/project/ace-collab-ext.css', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/ace-collab-ext.css');
+});
+
+app.get('/node_modules/ace-builds/src-min/ace.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/ace.js');
+});
+
+app.get('/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js');
+});
+
+app.get('/public_html/account/view/project/editor_contents.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/editor_contents.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/mode-javascript.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/mode-javascript.js');
+});
+
+app.get('/public_html/account/view/project/editor_contents.js', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/editor_contents.js');
+});
+
+// Handle requests for 7 dark themes 
+app.get('/node_modules/ace-builds/src-min/theme-monokai.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-monokai.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-dracula.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-dracula.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-merbivore.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-merbivore.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-clouds_midnight.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-clouds_midnight.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-pastel_on_dark.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-pastel_on_dark.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-tomorrow_night.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-tomorrow_night.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-ambiance.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-ambiance.js');
+});
+
+// Handle requests for 7 light themes 
+app.get('/node_modules/ace-builds/src-min/theme-tomorrow.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-tomorrow.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-github.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-github.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-chrome.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-chrome.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-dawn.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-dawn.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-textmate.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-textmate.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-eclipse.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-eclipse.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/theme-xcode.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/theme-xcode.js');
+});
+
+app.get('/node_modules/ace-builds/src-min/worker-javascript.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/worker-javascript.js');
+});
 
 // Serve the Help HTML file
 app.get('/help', (req, res) => {
@@ -249,14 +363,14 @@ app.get('/public_html/help/help.css', (req, res) => {
     res.sendFile(__dirname + '/public_html/help/help.css');
 });
 
-// Serve the image file
+// Serve the image file for logo
 app.get('/public_html/img/hivescript_new_logo.png', (req, res) => {
     res.sendFile(__dirname + '/public_html/img/hivescript_new_logo.png');
 });
 
+// Handle request to retrieve project page
 app.get('/project/:projectId', authenticate, async (req, res) => {
     const projectId = req.params.projectId;
-    
     try {
         const project = await Project.findOne({ projectId: projectId }).exec();
         if (!project) {
@@ -272,31 +386,8 @@ app.get('/project/:projectId', authenticate, async (req, res) => {
     }
 });
 
-app.post('/project/:projectId/save-state', async (req, res) => {
-    const projectId = req.params.projectId;
-    const { editorState } = req.body;
-
-    try {
-        const project = await Project.findOne({ projectId }).exec();
-
-        if (!project) {
-            console.log("Project not found.");
-            res.status(404).send("Project not found.");
-            return;
-        }
-
-        // Update the editor state in the project document
-        project.editorState = editorState;
-        await project.save();
-
-        res.status(200).send("Editor state saved successfully.");
-    } catch (error) {
-        console.error("Error saving editor state:", error);
-        res.status(500).send("Error saving editor state.");
-    }
-});
-
-app.get('/project/load-state/:projectId', async (req, res) => {
+// Handle request to get last saved contents for editor
+app.get('/project/:projectId/load-contents', async (req, res) => {
     const projectId = req.params.projectId;
 
     try {
@@ -310,11 +401,30 @@ app.get('/project/load-state/:projectId', async (req, res) => {
 
         // Return the editor state as JSON
         res.status(200).json({
-            editorState: project.editorState,
+            editorContents: project.editorContents,
         });
     } catch (error) {
-        console.error("Error loading editor state:", error);
-        res.status(500).send("Error loading editor state.");
+        console.error("Error loading editor contents:", error);
+        res.status(500).send("Error loading editor contents.");
+    }
+});
+
+// Handle request to get user information
+app.get('/user/:username', async (req, res) => {
+    const username = req.params.username;
+
+    try {
+        const user = await User.findOne({ username: username }).exec();
+        if (!user) {
+            // Handle case where user with the specified username is not found
+            res.status(404).json({ error: 'User not found' });
+        } else {
+            // Return the user information as JSON
+            res.status(200).send({ user: user });
+        }
+    } catch (error) {
+        console.error('Error fetching user details:', error);
+        res.status(500).json({ error: 'Internal Server Error' });
     }
 });
 
@@ -375,7 +485,6 @@ app.get('/user/:username/projects/shared', authenticate, async (req, res) => {
 // Handle request to get notification count and update notification badge on homepage
 app.get('/user/:username/update-notification-badge', authenticate, async (req, res) => {
     const username = req.params.username;
-    console.log(username);
 
     try {
         const user = await User.findOne({ username }).exec();
@@ -396,8 +505,6 @@ app.get('/user/:username/update-notification-badge', authenticate, async (req, r
                 unreadNotificationCount++;
             }
         }
-
-        console.log(unreadNotificationCount);
 
         user.unreadNotifications = unreadNotificationCount.toString();
         await user.save();
@@ -430,10 +537,6 @@ app.post('/login', (req, res) => {
             let data = h.update(toHash, 'utf-8');
             let result = data.digest('hex');
 
-            console.log(currentUser.salt);
-            console.log(toHash);
-            console.log(result);
-
             if (result == currentUser.hash) {
                 console.log('Username and password match.');
                 let sid = addSession(userData.username);
@@ -442,7 +545,7 @@ app.post('/login', (req, res) => {
                 { maxAge: 60000 * 2 });
                 res.status(200).send('User successfully authenticated.');
             } else {
-                res.status(500).send('ISSUE OCCURRED.');
+                res.status(500).send('Incorrect password.');
             }
         }
     });
@@ -460,12 +563,11 @@ app.post('/register', (req, res) => {
             let data = h.update(toHash, 'utf-8');
             let result = data.digest('hex');
 
-            console.log(newSalt);
-            console.log(toHash);
-            console.log(result);
+            const first = `${userData.firstName.slice(0, 1).toUpperCase()}${userData.firstName.slice(1).toLowerCase()}`
+            const last = `${userData.lastName.slice(0, 1).toUpperCase()}${userData.lastName.slice(1).toLowerCase()}`
 
+            // Get month and year user created account
             const month = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
-
             const d = new Date();
             let monthJoined = month[d.getUTCMonth()];
             let yearJoined = d.getUTCFullYear();
@@ -473,11 +575,11 @@ app.post('/register', (req, res) => {
 
             let newUser = new User({
                 username: userData.username,
-                firstName: userData.firstName,
-                lastName: userData.lastName,
-                displayName: userData.username,
+                firstName: first,
+                lastName: last,
+                displayName: `${first} ${last}`,
                 dateJoined: dateJoined,
-                notifications: Array,
+                unreadNotifications: String,
                 hash: result,
                 salt: newSalt,
                 owned: Array,
@@ -537,7 +639,7 @@ app.post('/project/create', async (req, res) => {
             queenBee: userData.username,
             workingBees: [],
             projectTitle: "New Project", // Provide a default title
-            editorState: null, 
+            editorContents: editorContents, 
         });
 
         await newProject.save();
@@ -608,11 +710,40 @@ app.post('/project/:projectId/delete', async (req, res) => {
     }
 });
 
-// Handle request to invite a user to the project
-async function createNotification(username, type, message) {
+// Handle request to save editor contents
+app.post('/project/:projectId/save-contents', async (req, res) => {
+    const projectId = req.params.projectId;
+    const editorContents = req.body.editorContents;
+
+    try {
+        const project = await Project.findOne({ projectId }).exec();
+
+        if (!project) {
+            console.log("Project not found.");
+            res.status(404).send("Project not found.");
+            return;
+        }
+
+        // Update the editor state in the project document
+        project.editorContents = editorContents;
+        const savedProject = await project.save();
+
+        console.log("Editor contents saved successfully.");
+        console.log("Project editor contents updated: " + savedProject);
+        res.status(200).send("Editor contents saved successfully.");
+    } catch (error) {
+        console.log("Issue saving editor contents.");
+        console.error(error);
+        res.status(500).send("Issue saving editor contents.");
+    }
+});
+
+// Create a notification that lets user know there's a new saved version of the editor
+async function createNotification(receiver, sender, type, message) {
     try {
         const notification = new Notification({
-            receiver: username,
+            receiver: receiver,
+            sender: sender,
             type: type,
             message: message,
         });
@@ -626,6 +757,28 @@ async function createNotification(username, type, message) {
     }
 }
 
+// Create a notification that lets user know they have been invited to a new project
+async function createInviteNotification(receiver, sender, title, projectID, message) {
+    try {
+        const notification = new Notification({
+            receiver: receiver,
+            sender: sender,
+            title: title,
+            type: 'Invite',
+            projectID: projectID,
+            message: message,
+        });
+
+        const savedNotification = await notification.save();
+
+        return savedNotification; // Return the notification reference
+    } catch (error) {
+        console.error("Error creating notification:", error);
+        throw error;
+    }
+}
+
+// Handle request to invite a user to project
 app.post('/project/:projectId/invite-user', async (req, res) => {
     const projectId = req.params.projectId;
     const inviteeUsername = req.body.invitee;
@@ -660,10 +813,10 @@ app.post('/project/:projectId/invite-user', async (req, res) => {
         const message = `${inviterUser.firstName} ${inviterUser.lastName} (@${inviterUser.username}) has invited you to collaborate on a new project!`;
 
         // Create a notification for the invitee
-        const notificationId = await createNotification(inviteeUsername, 'New document shared! 🎉', message);
+        const notification = await createInviteNotification(inviteeUsername, inviterUsername, 'New document shared! 🎉', projectId, message);
 
         // Add the notification ID to the invitee's notifications array
-        inviteeUser.notifications.push(notificationId);
+        inviteeUser.notifications.push(notification);
         await inviteeUser.save();
 
         // Add the project ID to the invitee's shared array
@@ -681,9 +834,165 @@ app.post('/project/:projectId/invite-user', async (req, res) => {
     }
 });
 
+// Handle request to mark all opened notifications as read
+app.post('/user/mark-notifications-as-read', async (req, res) => {
+    const username = req.body.username;
 
+    try {
+        const user = await User.findOne({ username: username });
 
+        if (user) {
+            // Extract notification IDs from the user's notifications
+            const notificationIds = user.notifications.map(notification => notification._id);
 
+            // Update the isRead property for notifications in the Notification collection
+            await Notification.updateMany(
+                { _id: { $in: notificationIds } },
+                { $set: { isRead: true } }
+            );
+
+            // Update the unreadNotifications count
+            user.unreadNotifications = "0";
+            await user.save();
+
+            console.log('Notifications marked as read successfully.');
+            res.status(200).send('Notifications marked as read successfully.');
+        } else {
+            res.status(404).send('User not found.');
+        }
+    } catch (error) {
+        console.error('Error marking notifications as read:', error);
+        res.status(500).send('Error marking notifications as read.');
+    }
+});
+
+// Handle request to delete notifications
+app.post('/user/delete-notifications', async (req, res) => {
+    const username = req.body.username;
+    console.log(username);
+    const notificationIds = req.body.notificationIds;
+
+    try {
+        // Find the user
+        const user = await User.findOne({ username });
+
+        if (user) {
+            // Remove the checked notifications from the user's array
+            user.notifications = user.notifications.filter(
+                (notification) => !notificationIds.includes(notification._id.toString())
+            );
+
+            // Save the updated user
+            await user.save();
+
+            // Remove the notifications from the global collection (optional)
+            await Notification.deleteMany({ _id: { $in: notificationIds } });
+            console.log("beach");
+            res.status(200).send('Notifications deleted successfully.');
+        } else {
+            res.status(404).send('User not found.');
+        }
+    } catch (error) {
+        console.error('Error deleting notifications:', error);
+        res.status(500).send('Error deleting notifications.');
+    }
+});
+
+// Default contents for an editor on a new project
+function defaultEditorContents(){
+    const contents = `// Start coding here
+function greet(name) {
+    console.log("Hello, " + name + "!");
+}
+
+function addNumbers(a, b) {
+    return a + b;
+}
+
+var fruits = ['apple', 'banana', 'orange'];
+
+for (var i = 0; i < fruits.length; i++) {
+    console.log("I like " + fruits[i] + "s.");
+}
+
+// Uncomment the line below to see the greeting
+// greet('John');
+
+// Uncomment the line below to see the result of adding two numbers
+// var sum = addNumbers(5, 7);
+// console.log("The sum is: " + sum);
+
+function square(x) {
+    return x * x;
+}
+
+function displaySquare(value) {
+    console.log("The square of " + value + " is: " + square(value));
+}
+
+// Uncomment the line below to display the square of a number
+// displaySquare(4);
+
+// Creating an object
+var person = {
+    name: 'Alice',
+    age: 30,
+    profession: 'Engineer'
+};
+
+console.log(person.name + " is " + person.age + " years old and works as an " + person.profession + ".");
+
+function multiplyByTwo(num) {
+    return num * 2;
+}
+
+var randomNum = Math.floor(Math.random() * 100);
+console.log("A random number: " + randomNum);
+
+function printNumbers(count) {
+    for (var k = 1; k <= count; k++) {
+        console.log(k);
+    }
+}
+
+for (var j = 0; j < 5; j++) {
+    console.log("Iteration " + (j + 1) + " of the loop.");
+}
+var colors = ['red', 'blue', 'green'];
+
+// Loop to display colors
+for (var color of colors) {
+    console.log("Color: " + color);
+}
+
+// Function to check if a number is even
+function isEven(number) {
+    return number % 2 === 0;
+}
+
+// Creating an array of objects
+var students = [
+    { name: 'John', age: 25, grade: 'A' },
+    { name: 'Emily', age: 22, grade: 'B' },
+    { name: 'Mike', age: 24, grade: 'A-' }
+];
+
+// Loop to display information about students
+for (var student of students) {
+    console.log(student.name + " is " + student.age + " years old and received a grade of " + student.grade + ".");
+}
+
+// Function to calculate the factorial of a number
+function factorial(n) {
+    if (n === 0 || n === 1) {
+        return 1;
+    } else {
+        return n * factorial(n - 1);
+    }
+}
+    `
+    return contents;
+}
 
 app.listen(port, async () => {
     console.log(`Server is running at http://${hostname}:${port}`);

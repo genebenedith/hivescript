@@ -84,9 +84,9 @@ function login(event) {
             console.log("User successfully authenticated.");
             window.location.href = '/public_html/account/homepage/home.html';
         } else if (response.status === 500) {
-            alert("Issue authenticating user.");
+            alert("Incorrect password.");
         } else if (response.status === 400) {
-            console.log("Cannot find user.")
+            console.log("Cannot find user.");
             alert("Cannot find user.");
         };
     });

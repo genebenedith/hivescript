@@ -122,18 +122,14 @@ body{
 
 .bio-row p span {
     width: 80px;
+    width: 80px;
     display: inline-block;
 }
-
-/* body{
-    margin-top:20px;
-    background:#FDFDFF
-} */
 
 .container-fluid {
     width: 80px;
     display: inline-block;
-    width: 50%;
+    width: 75%;
     margin-bottom: 10px;
     padding:0 15px;
 
@@ -181,6 +177,20 @@ body{
     width: 100%;
     box-shadow: none;
 }
+
+#selectAllNotifications {
+    margin-left: 15px !important;
+}
+
+#selectAll {
+    margin: 10px !important; 
+    vertical-align: right; 
+}
+
+.checkbox {
+    margin-right: 20px;
+}
+
 .inbox .action_bar .delete_all {
     margin-bottom: 0;
     margin-top: 8px
@@ -194,7 +204,9 @@ body{
 .inbox .mail_list .list-group-item {
     border: 0;
     padding: 15px;
-    margin-bottom: 1px
+    margin-bottom: 1px;
+    width: 100%;
+    /* box-sizing: border-box; */
 }
 
 .inbox .mail_list .list-group-item:hover {
@@ -223,8 +235,6 @@ body{
     margin: 0;
     padding: 10px
 }
-
-
 
 .inbox .mail_list .list-group-item .thumb {
     display: inline-block
@@ -258,6 +268,7 @@ body{
 .inbox .mail_list .list-group-item .msg {
     margin-bottom: 0px
     
+    
 }
 
 
@@ -280,16 +291,30 @@ body{
     }
 }
 
-.trash-button {
+#trash-button {
     position: absolute;
-    top: 150px; 
-    right: 50px; 
+    top: 217px; 
+    right: 820px; 
     z-index: 1;
     padding: 10px 20px;
-    background-color: #fbc02d;
-    color: #080808;
+    background-color: transparent;
+    color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    font-size: 20px;
+}
+#trash-button:hover {
+    position: absolute;
+    top: 217px; 
+    right: 820px; 
+    z-index: 1;
+    padding: 10px 20px;
+    background-color: transparent;
+    color: gold;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 20px;
 }
   

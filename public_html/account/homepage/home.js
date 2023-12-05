@@ -1,8 +1,13 @@
 const username = getUsername();
-const welcomeMessage = document.getElementById('welcomeMessage');
-welcomeMessage.textContent = `${username.slice(0,1).toUpperCase()}${username.slice(1).toLowerCase()}'s Projects`;
+document.addEventListener('DOMContentLoaded', async () => {
+    
+    const userInfo = await getUserInfo();  
+    const firstName = userInfo.firstName;
+    const displayName = userInfo.displayName;
 
-document.addEventListener('DOMContentLoaded', () => {
+    const welcomeMessage = document.getElementById('welcomeMessage');
+    welcomeMessage.textContent = `${firstName.slice(0, 1).toUpperCase()}${firstName.slice(1).toLowerCase()}'s Projects`;
+    
     updateNotificationBadge();
     fetchOwnedProjects();
     fetchSharedProjects();
@@ -90,18 +95,25 @@ function createProjectCard(project) {
     projectCard.addEventListener('click', () => {
         const clickedProjectId = projectCard.dataset.projectId;
 
+        const url = `/project/${clickedProjectId}`;
         // Make a request to the server to fetch project details
-        fetch(`/project/${clickedProjectId}`)
-            .then(response => {
-                if (response.status === 200) {
-                    window.location.href = `/project/${clickedProjectId}`;
-                } else {
-                    console.error('Error fetching project details:', response.statusText);
-                }
-            })
-            .catch(error => {
-                console.error('Error fetching project details:', error);
-            });
+        fetch(url, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => {
+            if (response.status === 200) {
+                console.log("back");
+                window.location.href = url;
+            } else {
+                console.error('Error fetching project details:', response.statusText);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching project details:', error);
+        });
     });
 
     // Handle edit icon click (modify project title)
@@ -146,7 +158,6 @@ function modifyProjectTitle(projectCard) {
 }
 
 function deleteProject(projectCard) {
-    // Implement logic to delete the project here
     const projectId = projectCard.dataset.projectId;
 
     // Make a request to the server to delete the project
@@ -209,25 +220,15 @@ function getUsername() {
     }
 }
 
-function getFirstName() {
-    const cookie = document.cookie;
-    const cookiePairs = cookie.split('; ');
-
-    let firstName = '';
-
-    for (const cookiePair of cookiePairs) {
-        const [name, value] = cookiePair.split('=');
-        if (name === 'login') {
-            const encodedData = decodeURIComponent(value);
-            
-            const jsonStart = encodedData.indexOf('{');
-            const jsonData = encodedData.substring(jsonStart);
-
-            const data = JSON.parse(jsonData);
-
-            firstName = data.firstName;
-            return firstName;
-        }
+async function getUserInfo() {
+    
+    try {
+        const response = await fetch(`/user/${username}`);
+        const data = await response.json();
+        return data.user;
+    } catch (error) {
+        console.error('Error fetching user information:', error);
+        throw error;
     }
 }
 
@@ -247,10 +248,8 @@ function visitProfile(tab) {
         fetch(`/profile/${username}?tab=${tab}`)
             .then(response => {
                 if (response.status === 200) {
-                    console.log("soda");
                     window.location.href = `/profile/${username}?tab=${tab}`;
                 } else {
-                    console.log("pie");
                     console.error('Error fetching user profile:', response.statusText);
                 }
             })
