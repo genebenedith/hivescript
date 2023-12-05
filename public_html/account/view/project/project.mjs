@@ -1,4 +1,5 @@
 const projectId = document.body.dataset.projectId; 
+const inviteUserButton = document.getElementById("inviteUser");
 const username = getUsername();
 
 const currentUser = {
@@ -155,6 +156,42 @@ function getRandomColor() {
     return color;
 }
 
+function inviteUser(event) {
+    const inviteeUsername = document.getElementById("inviteeUsername").value;
+    const inviteResponseElement = document.getElementById("inviteResponse");
+
+    event.preventDefault();
+
+    // Send a POST request to the server to invite the user
+    fetch(`/project/${projectId}/invite-user`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ invitee: inviteeUsername, inviter: username }),
+    })
+    .then(result => {
+        if (result.status === 200) {
+            // Invite successfully sent
+            inviteResponseElement.innerText = "Invite successfully sent";
+        } else if (result.status === 404) {
+            // Project not found
+            inviteResponseElement.innerText = "Project not found";
+        } else if (result.status === 400) {
+            // Could not find user
+            inviteResponseElement.innerText = "Could not find user";
+        } else {
+            // An issue occurred
+            inviteResponseElement.innerText = "An issue occurred. Please try again later";
+        }
+    })
+    .catch(error => {
+        console.error("Error inviting user:", error);
+        // Log or handle the error appropriately
+        inviteResponseElement.innerText = "An issue occurred. Please try again later";
+    });
+}
+
 function getUsername() {
     const cookie = document.cookie;
     const cookiePairs = cookie.split('; ');
@@ -200,3 +237,6 @@ function getUserInfo() {
             console.log(error);
         });
 }
+
+
+inviteUserButton.addEventListener('click', inviteUser);
