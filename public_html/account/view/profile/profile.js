@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Check for the tab from document data set
     const tab = getTabFromDataset();
-    console.log(tab);
-    console.log("pie above");
     showTab(tab)
 });
 
