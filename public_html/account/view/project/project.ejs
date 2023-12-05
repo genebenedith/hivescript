@@ -24,9 +24,40 @@
         <p>Project ID: <%= project.projectId %></p>
         <br>
         <div class="title"><%= project.projectTitle %></div>
-        <!-- save button -->
-        <div class="save-button-container">
+        
+        <div class="button-container">
+          <!-- invite user button -->
+          <!-- Trigger the modal with a button -->
+          <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Invite User</button>
+          
+          <!-- Modal -->
+          <div class="modal fade" id="myModal" role="dialog">
+              <div class="modal-dialog">
+              
+              <!-- Modal content-->
+              <div class="modal-content">
+                  <div class="modal-header">
+                  <button type="button" class="close" data-dismiss="modal">&times;</button>
+                  <h4 class="modal-title">Invite User</h4>
+                  </div>
+                  <div class="modal-body">
+                  <form onsubmit="inviteUser(event)">
+                      <label for="inviteeUsername">Enter the username:</label>
+                      <input type="text" id="inviteeUsername" name="inviteeUsername" value=""><br><br>
+                      <input type="submit" value="Invite User" id="inviteUser"><br><br>
+                      <p id="inviteResponse"></p>
+                  </form>
+                  </div>
+                  <div class="modal-footer">
+                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                  </div>
+              </div>
+              
+              </div>
+          </div>
+          <!-- save button -->
           <button id="save-button">Save Editor</button>
+          <!-- change theme -->
           <label for="themeSelect">Change Theme</label>
           <select id="theme-selector">
             <optgroup label="Light">
@@ -52,6 +83,7 @@
               </optgroup>
           </select>
         </div>
+        
         <div class="editors">
           <div class="editor-column">
             <div class="editor-label">Target Editor</div>
