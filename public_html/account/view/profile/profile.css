@@ -1,5 +1,5 @@
 body{
-    color: black;
+    color: rgb(249, 249, 249);
     background: #f1f2f7;
     font-family: 'Open Sans', sans-serif;
     padding: 0px !important;
@@ -121,7 +121,7 @@ body{
 }
 
 .bio-row p span {
-    width: 100px;
+    width: 80px;
     display: inline-block;
 }
 
@@ -129,6 +129,15 @@ body{
     margin-top:20px;
     background:#FDFDFF
 } */
+
+.container-fluid {
+    width: 80px;
+    display: inline-block;
+    width: 50%;
+    margin-bottom: 10px;
+    padding:0 15px;
+
+}
 
 .badge {
     border-radius: 8px;
@@ -200,6 +209,7 @@ body{
 .inbox .mail_list .list-group-item .controls {
     display: inline-block;
     margin-right: 10px;
+    margin-left: 20px;
     vertical-align: top;
     text-align: center;
     margin-top: 11px
@@ -214,9 +224,7 @@ body{
     padding: 10px
 }
 
-.inbox .mail_list .list-group-item .controls .favourite {
-    margin-left: 10px
-}
+
 
 .inbox .mail_list .list-group-item .thumb {
     display: inline-block
@@ -249,11 +257,9 @@ body{
 
 .inbox .mail_list .list-group-item .msg {
     margin-bottom: 0px
+    
 }
 
-.inbox .mail_list .unread {
-    border-left: 2px solid
-}
 
 .inbox .mail_list .unread .media-heading a {
     color: #333;
@@ -268,8 +274,22 @@ body{
     background: #e6e6e6
 }
 
-@media only screen and (max-width: 767px) {
+@media only screen and (max-width: 500px) {
     .inbox .mail_list .list-group-item .controls {
         margin-top: 3px
     }
 }
+
+.trash-button {
+    position: absolute;
+    top: 150px; 
+    right: 50px; 
+    z-index: 1;
+    padding: 10px 20px;
+    background-color: #fbc02d;
+    color: #080808;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
