@@ -279,3 +279,17 @@ body{
         margin-top: 3px
     }
 }
+
+.trash-button {
+    position: absolute;
+    top: 150px; 
+    right: 50px; 
+    z-index: 1;
+    padding: 10px 20px;
+    background-color: #fbc02d;
+    color: #080808;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+  
