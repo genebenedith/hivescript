@@ -248,10 +248,8 @@ function visitProfile(tab) {
         fetch(`/profile/${username}?tab=${tab}`)
             .then(response => {
                 if (response.status === 200) {
-                    console.log("soda");
                     window.location.href = `/profile/${username}?tab=${tab}`;
                 } else {
-                    console.log("pie");
                     console.error('Error fetching user profile:', response.statusText);
                 }
             })
