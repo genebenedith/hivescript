@@ -31,9 +31,9 @@
                 </div>
                 <ul class="nav nav-pills nav-stacked">
                     <li class="active"><a href="#" onclick="showTab('profile-tab')"> <i class="fa fa-user"></i>Profile</a></li>
-                    <li><a href="#notifications" onclick="showTab('notifications-tab'); readNotifications('<%= user.username %>')"> <i class="fa fa-calendar"></i>Notifications <span class="label label-warning pull-right r-activity"><%= user.unreadNotifications %> UNREAD</span></a></li>
+                    <li><a href="#notifications" onclick="showTab('notifications-tab'); readNotifications('<%= user.username %>')"> <i class="fa fa-bell-o" aria-hidden="true"></i>Notifications <span class="label label-warning pull-right r-activity"><%= user.unreadNotifications %> UNREAD</span></a></li>
                     <li><a href="#edit" onclick="showTab('edit-tab')"> <i class="fa fa-edit"></i>Edit Profile</a></li>
-                    <li><a href="/"> <i class="fa-solid fa-house"></i>Back to Home</a></li>
+                    <li><a href="/"> <i class="fa fa-home" aria-hidden="true"></i>Back to Home</a></li>
                 </ul>
             </div>
             <div class="panel">
