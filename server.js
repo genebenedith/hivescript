@@ -6,32 +6,32 @@ const fs = require('fs');
 const crypto = require('crypto');
 const path = require('path');
 const uuid = require('uuid');
-const WebSocket = require('ws')
-
+const WebSocket = require('ws');
+const http = require('http');
 
 const port = 80; 
 const hostname = 'localhost'; // For now 
 
 const app = express();
-// const server = http.createServer(app);
-// const wss = new WebSocket.Server({ server });
+const server = http.createServer(app);
+const wss = new WebSocket.Server({ server });
 
-// wss.on('connection', (ws) => {
-//     // Handle new WebSocket connections
-//     console.log('WebSocket connection established.');
+wss.on('connection', (ws) => {
+    // Handle new WebSocket connections
+    console.log('WebSocket connection established.');
     
-//     // Listen for messages from clients
-//     ws.on('message', (message) => {
-//         console.log(`Received message: ${message}`);
+    // Listen for messages from clients
+    ws.on('message', (message) => {
+        console.log(`Received message: ${message}`);
 
-//         // Broadcast the message to all connected clients
-//         wss.clients.forEach((client) => {
-//             if (client !== ws && client.readyState === WebSocket.OPEN) {
-//                 client.send(message);
-//             }
-//         });
-//     });
-// });
+        // Broadcast the message to all connected clients
+        wss.clients.forEach((client) => {
+            if (client !== ws && client.readyState === WebSocket.OPEN) {
+                client.send(message);
+            }
+        });
+    });
+});
 
 // Define the MongoDB connection string
 const mongoDBURL = "mongodb+srv://gbenedith:k0HWPrO07X9Cki1l@hivescript.owmolsx.mongodb.net/hivescript?retryWrites=true&w=majority";
@@ -998,3 +998,8 @@ app.listen(port, async () => {
     console.log(`Server is running at http://${hostname}:${port}`);
     
 });
+
+// // Listen for HTTP and WebSocket protocols
+// server.listen(port, () => {
+//     console.log(`Server is listening on ${port}`);
+// });
