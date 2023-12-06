@@ -183,7 +183,6 @@ img{
 }
 
 .module-img{
-  width:40%;
   margin-left: 30%;
   margin-right: 30%;
   margin-bottom: -20px;
@@ -202,7 +201,6 @@ img{
   border-radius:5px;
   padding:8px;
 }
-
 
 #cancelButton{
   background-color: #ffeea8;
