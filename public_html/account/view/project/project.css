@@ -23,6 +23,9 @@
 
 .body {
     margin: 0;
+    padding: 0px;
+    background-color: white;
+    font-family: 'Montserrat';
   }
   
   .main-container {
@@ -63,21 +66,39 @@
     margin-bottom: 10px;
   }
   
-  .editor {
+.editor {
     display: inline-block;
     margin-left: 10px;
     flex: 1;
   }
   
-  .wrapped-editor {
+.wrapped-editor {
     flex: 1;
     display: flex;
   }
   
-  #target-radar-view {
+#target-radar-view {
     display: inline-block;
     min-width: 20px;
     background: #2F3129;
   }
-  
-  
+
+#inviteButton{
+    background-color: #ffcc00;
+    font-family: 'Montserrat';
+    margin:10px;
+    padding:5px;
+}
+
+#save-button{
+    padding:5px;
+    background-color: #ffcc00;
+    font-family: 'Montserrat';
+}
+
+
+#theme-selector{
+    background-color: #fff3c3;
+    font-family: 'Montserrat';
+    padding: 5px;
+}
