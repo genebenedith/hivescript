@@ -1,83 +1,209 @@
-/* .cm-editor { 
-    height: 300px; 
-    border: 1px solid #ddd
+body{
+  margin:0px;
+  padding:0px;
+  font-family: 'Montserrat';
+  background-color: black;
 }
 
-.cm-scroller { 
-    overflow: auto; 
+.header-container{
+  display:flex;
+  text-align: right;
 }
-
-.remote-cursor {
-    position: absolute;
-    background-color: #ffcc00; 
-    width: 2px;
-    height: 100%;
-}
-  
-.cursor-username {
-    font-size: 12px;
-    background-color: #ffcc00; 
-    padding: 2px;
-    color: white;
-} */
 
 .body {
-    margin: 0;
-  }
+  margin: 0;
+  background-color: black;
+}
+
+.projInfo-contain{
+  display: block;
+  text-align: left;
+}
+
+.main-container {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 10px;
+}
   
-  .main-container {
-    position: absolute;
-    top: 0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    display: flex;
-    flex-direction: column;
-    padding: 5px;
-  }
+.title {
+  font-family:'Montserrat';
+  font-weight: bold;
+  font-size: 30px;
+  margin-bottom: 10px;
+  margin-top:-20px;
+}
+
+.projID{
+  font-family:'Montserrat';
+  margin-top: -10px;
+  margin-bottom: 20px;
+}
   
-  .title {
-    font-family: "Helvetica Neue", sans-serif;
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
+.editors {
+  display: flex;
+  flex-direction: row;
+  flex: 1;
+}
   
-  .editors {
-    display: flex;
-    flex-direction: row;
-    flex: 1;
-  }
+.editor-column {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+} 
   
-  .editor-column {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-  }
+.editor-label {
+  text-align: center;
+  font-family: "Helvetica Neue", sans-serif;
+  font-size: 14px;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
   
-  .editor-label {
-    text-align: center;
-    font-family: "Helvetica Neue", sans-serif;
-    font-size: 14px;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
+.editor {
+  display: inline-block;
+  flex: 1;
+  margin:3px;
+}
   
-  .editor {
-    display: inline-block;
-    margin-left: 10px;
-    flex: 1;
-  }
+.wrapped-editor {
+  flex: 1;
+  display: flex;
+}
   
-  .wrapped-editor {
-    flex: 1;
-    display: flex;
-  }
+#target-radar-view {
+  display: inline-block;
+  min-width: 20px;
+  background: #2F3129;
+  margin-left:0px;
+  padding-left:0px;
+}
   
-  #target-radar-view {
-    display: inline-block;
-    min-width: 20px;
-    background: #2F3129;
-  }
+#inviteButton{
+  background-color: #ffcc00;
+  color:black;
+  border: 1px solid white;
+  font-family: 'Montserrat';
+  font-size: 18px;
+  margin-left: 25px;
+}
   
-  
+#inviteButton:hover{
+  background-color: #ffeea8;
+  border: 1px solid black;
+  font-size:19px;
+}
+
+#save-button{
+  background-color: #ffcc00;
+  color:black;
+  border: 1px solid white;
+  border-radius: 5px;
+  font-family: 'Montserrat';
+  width:40%;
+  padding-top:10px;
+  padding-bottom: 10px;
+}
+
+#save-button:hover{
+  background-color: #ffeea8;
+  border: 1px solid black;
+  font-size:15px;
+  padding-top: 9px;
+  padding-bottom: 9px;
+}
+
+.helpAndHome{
+  background-image: url(/public_html/img/hivescript_new_logo.png);  
+  background-color: #ffcc00;
+  border: 1px solid white;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin-left:5px;
+  margin-right:5px;
+  float:right;
+}
+
+.helpAndHome:hover{
+  background-image: url(/public_html/img/hivescript_new_logo.png);  
+  background-color: #ffeea8;
+  border: 1px solid black;
+  border-radius: 5px;
+  width: 40px;
+  height: 40px;
+  margin-left:5px;
+  margin-right:5px;
+  float:right;
+}
+
+.contain-saveAndTheme{
+  padding-top: 10px;
+  padding-left: 5px;
+  padding-right: 5px;
+  text-align: center;
+}
+
+#labelTheme{
+  justify-content: space-between;
+  font-family:'Montserrat';
+  margin-left: 8%;
+}
+
+#theme-selector{
+  font-family:'Montserrat';
+  width:29%;
+  border-radius: 5px;
+  background-color: #ffeea8;
+  border: 1px solid #ffcc00;
+  padding-top:6px;
+  padding-bottom: 6px;
+  margin-right: -20px;
+  padding-left: 6px;
+  padding-right: 6px;
+}
+
+img{
+  height:165px;
+  margin-top:-30px;  /* logo not well-cropped; compensate */
+}
+
+.button-header-container{
+  display: block;
+}
+
+.button-container{
+  text-align: center;
+  font-family:'Montserrat';
+}
+
+.module-img{
+  margin-left: 30%;
+  margin-right: 30%;
+  margin-bottom: -20px;
+}
+
+#inviteeUsername{
+  border: 1px solid black;
+  border-radius:5px;
+  margin-left: 15px;
+  padding:8px;
+}
+
+#inviteUser{
+  background-color: #ffcc00;
+  border: 1px solid black;
+  border-radius:5px;
+  padding:8px;
+}
+
+#cancelButton{
+  background-color: #ffeea8;
+  border: 1px solid black;
+  border-radius: 5px;
+}

@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Project Details</title>
+    <title>HiveScript | Project Editor</title>
     <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/account/view/project/project.css">
     <!-- Modal Bootstrap -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
@@ -16,49 +16,71 @@
     <script src="/node_modules/ace-builds/src-min/ace.js"></script>
     <script src="/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js" type="text/javascript" charset="utf-8"></script>
     <script src="/public_html/account/view/project/editor_contents.js" type="text/javascript" charset="utf-8"></script>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="icon" href="/public_html/img/hivescript_new_logo.png">
 </head>
 <body data-project-id="<%= project.projectId %>">
     
     <div class="main-container">
-        <h1>Project Details</h1>
-        <p>Project ID: <%= project.projectId %></p>
-        <br>
-        <div class="title"><%= project.projectTitle %></div>
-        
-        <div class="button-container">
-          <!-- invite user button -->
-          <!-- Trigger the modal with a button -->
-          <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Invite User</button>
-          
-          <!-- Modal -->
-          <div class="modal fade" id="myModal" role="dialog">
-              <div class="modal-dialog">
-              
-              <!-- Modal content-->
-              <div class="modal-content">
-                  <div class="modal-header">
-                  <button type="button" class="close" data-dismiss="modal">&times;</button>
-                  <h4 class="modal-title">Invite User</h4>
-                  </div>
-                  <div class="modal-body">
-                  <form onsubmit="inviteUser(event)">
-                      <label for="inviteeUsername">Enter the username:</label>
-                      <input type="text" id="inviteeUsername" name="inviteeUsername" value=""><br><br>
-                      <input type="submit" value="Invite User" id="inviteUser"><br><br>
-                      <p id="inviteResponse"></p>
-                  </form>
-                  </div>
-                  <div class="modal-footer">
-                  <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                  </div>
-              </div>
-              
-              </div>
+      <div class="button-header-container">
+        <img src="/public_html/img/hivescript_new_logo.png" alt="Logo" class="logo">
+          <button id="homeButton" onclick="window.location.href = '/public_html/account/homepage/home.html'" class="helpAndHome"><i class="fa fa-home"></i></button>
+          <button id="helpButton" onclick="window.location.href = '/help'" class="helpAndHome"><i class="fa fa-question-circle"></i></button>
+      </div>
+      <div class="header-container">
+          <div class="projInfo-contain">
+            <div class="title"><%= project.projectTitle %></div>
+            <div class="projID">Project ID: <%= project.projectId %></div>
           </div>
-          <!-- save button -->
-          <button id="save-button">Save Editor</button>
-          <!-- change theme -->
-          <label for="themeSelect">Change Theme</label>
+          <div class="button-container">
+            <!-- invite user button -->
+            <!-- Trigger the modal with a button -->
+            <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="inviteButton">Invite User</button>
+            
+            <!-- Modal -->
+            <div class="modal fade" id="myModal" role="dialog">
+                <div class="modal-dialog">
+                
+                <div class="modal-content">
+                    <div class="modal-header">
+                    <img src="/public_html/img/hivescript_new_logo.png" alt="logo" class="module-img">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Invite User</h4>
+                    </div>
+                    <div class="modal-body">
+                    <form onsubmit="inviteUser(event)">
+                        <label for="inviteeUsername">Enter the invitee's username:</label>  <!-- mod -->
+                        <input type="text" id="inviteeUsername" name="inviteeUsername" value="" placeholder="User to invite"><br><br>
+                        <input type="submit" value="Send Invitation" id="inviteUser"><br><br>
+                        <p id="inviteResponse"></p>
+                    </form>
+                    </div>
+                    <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal" id="cancelButton">Cancel Invitation</button>
+                    </div>
+                </div>
+                
+                </div>
+            </div>
+           
+          </div> 
+      </div>
+        
+        <div class="editors">
+          <div class="editor-column">
+            <!-- <div class="editor-label">Editor</div> -->
+            <div class="wrapped-editor">
+              <div class="editor" id="target-editor" style="height: 100%; width: 100%;"></div>
+              <div class="radar-view" id="target-radar-view"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="contain-saveAndTheme">
+        <button id="save-button">Save Editor</button>
+
+        <label for="themeSelect" id="labelTheme">Change Theme</label>
           <select id="theme-selector">
             <optgroup label="Light">
                 <!-- Light Themes Options -->
@@ -84,18 +106,9 @@
           </select>
         </div>
         
-        <div class="editors">
-          <div class="editor-column">
-            <div class="editor-label">Target Editor</div>
-            <div class="wrapped-editor">
-              <div class="editor" id="target-editor" style="height: 100%; width: 100%;"></div>
-              <div class="radar-view" id="target-radar-view"></div>
-            </div>
-          </div>
-        </div>
-        
       </div>
     
+    <script src="/public_html/account/view/project/codemirror/project.bundle.js"></script>
     <script type="module" src="/public_html/account/view/project/project.mjs"></script>
     <script>
         ace.config.setModuleUrl("ace/mode/javascript_worker", "/node_modules/ace-builds/src-min/worker-javascript.js");
