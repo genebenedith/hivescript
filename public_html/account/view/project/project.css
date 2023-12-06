@@ -196,14 +196,13 @@ img{
 }
 
 #inviteUser{
-  background-color: #ffcc00;
+  background-color: #ffeea8;
   border: 1px solid black;
   border-radius:5px;
   padding:8px;
 }
 
 #cancelButton{
-  background-color: #ffeea8;
   border: 1px solid black;
   border-radius: 5px;
 }
