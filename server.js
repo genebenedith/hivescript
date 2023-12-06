@@ -16,21 +16,69 @@ const app = express();
 const server = http.createServer(app);
 const wss = new WebSocket.Server({ server });
 
-wss.on('connection', (ws) => {
-    // Handle new WebSocket connections
+// Handle new WebSocket connections
+wss.on('connection', function connection(ws) {
+    
     console.log('WebSocket connection established.');
     
     // Listen for messages from clients
-    ws.on('message', (message) => {
-        console.log(`Received message: ${message}`);
-
+    ws.on('message', function incoming(data) {
+        const parsedMessage = JSON.parse(data);
+        // console.log(`Received message: ${data}`);
+        
         // Broadcast the message to all connected clients
-        wss.clients.forEach((client) => {
-            if (client !== ws && client.readyState === WebSocket.OPEN) {
-                client.send(message);
-            }
-        });
-    });
+        if (parsedMessage.type === 'editor-update') {
+            wss.clients.forEach((client) => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({ 
+                        type: 'editor-update', 
+                        id: parsedMessage.id,
+                        content: parsedMessage.content }));
+                }
+            });
+        } else if (parsedMessage.type === 'cursor-update') {
+            wss.clients.forEach((client) => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({
+                        type: 'cursor-update',
+                        id: parsedMessage.id,
+                        cursorPosition: parsedMessage.cursorPosition,
+                        cursorLabel: parsedMessage.cursorLabel,
+                        cursorColor: parsedMessage.cursorColor,
+                        rows: parsedMessage.rows,
+                        ranges: parsedMessage.ranges
+                    }));
+                }
+            });
+        } else if (parsedMessage.type === 'scrollbar-update') {
+            wss.clients.forEach((client) => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({
+                        type: 'scrollbar-update',
+                        id: parsedMessage.id,
+                        cursorPosition: parsedMessage.cursorPosition,
+                        cursorLabel: parsedMessage.cursorLabel,
+                        cursorColor: parsedMessage.cursorColor,
+                        rows: parsedMessage.rows
+                    }));
+                }
+            });
+        } else if (parsedMessage.type === 'selection-update') {
+            wss.clients.forEach((client) => {
+                if (client !== ws && client.readyState === WebSocket.OPEN) {
+                    client.send(JSON.stringify({
+                        type: 'selection-update',
+                        id: parsedMessage.id,
+                        cursorPosition: parsedMessage.cursorPosition,
+                        cursorLabel: parsedMessage.cursorLabel,
+                        cursorColor: parsedMessage.cursorColor,
+                        rows: parsedMessage.rows,
+                        ranges: parsedMessage.ranges
+                    }));
+                }
+            });
+        }
+    })
 });
 
 // Define the MongoDB connection string
@@ -278,6 +326,14 @@ app.get('/node_modules/ace-builds/src-min/ace.js', (req, res) => {
 app.get('/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js', (req, res) => {
     res.sendFile(__dirname + '/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js');
 });
+
+app.get('/public_html/account/view/project/src/ts/AceRangeUtil.ts', (req, res) => {
+    res.sendFile(__dirname + '/public_html/account/view/project/src/ts/AceRangeUtil.ts');
+});
+
+// app.get('/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js.map', (req, res) => {
+//     res.sendFile(__dirname + '/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js.map');
+// });
 
 app.get('/public_html/account/view/project/editor_contents.js', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/view/project/editor_contents.js');
@@ -729,7 +785,6 @@ app.post('/project/:projectId/save-contents', async (req, res) => {
         const savedProject = await project.save();
 
         console.log("Editor contents saved successfully.");
-        console.log("Project editor contents updated: " + savedProject);
         res.status(200).send("Editor contents saved successfully.");
     } catch (error) {
         console.log("Issue saving editor contents.");
@@ -994,12 +1049,12 @@ function factorial(n) {
     return contents;
 }
 
-app.listen(port, async () => {
-    console.log(`Server is running at http://${hostname}:${port}`);
+// app.listen(port, async () => {
+//     console.log(`Server is running at http://${hostname}:${port}`);
     
-});
-
-// // Listen for HTTP and WebSocket protocols
-// server.listen(port, () => {
-//     console.log(`Server is listening on ${port}`);
 // });
+
+// Listen for HTTP and WebSocket protocols
+server.listen(port, () => {
+    console.log(`Server is listening on ${port}`);
+});
