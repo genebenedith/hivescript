@@ -81,3 +81,4 @@ function readNotifications(username) {
         console.error('Error marking notifications as read:', error);
     }
 };
+
