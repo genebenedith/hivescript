@@ -28,6 +28,7 @@ body{
     height: 112px;
     border-radius: 50%;
     -webkit-border-radius: 50%;
+    clip-path: polygon(100.00% 50.00%,75.00% 93.30%,25.00% 93.30%,0.00% 50.00%,25.00% 6.70%,75.00% 6.70%);
 }
 
 .profile-nav .user-heading h1 {
