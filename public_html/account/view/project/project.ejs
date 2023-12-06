@@ -16,6 +16,8 @@
     <script src="/node_modules/ace-builds/src-min/ace.js"></script>
     <script src="/node_modules/@convergencelabs/ace-collab-ext/dist/umd/ace-collab-ext.js" type="text/javascript" charset="utf-8"></script>
     <script src="/public_html/account/view/project/editor_contents.js" type="text/javascript" charset="utf-8"></script>
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
+
 </head>
 <body data-project-id="<%= project.projectId %>">
     
@@ -28,7 +30,7 @@
         <div class="button-container">
           <!-- invite user button -->
           <!-- Trigger the modal with a button -->
-          <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal">Invite User</button>
+          <button type="button" class="btn btn-info btn-lg" data-toggle="modal" data-target="#myModal" id="inviteButton">Invite User</button>
           
           <!-- Modal -->
           <div class="modal fade" id="myModal" role="dialog">
