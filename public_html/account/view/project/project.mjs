@@ -1,33 +1,20 @@
 const projectId = document.body.dataset.projectId; 
 const inviteUserButton = document.getElementById("inviteUser");
 const username = getUsername();
+const activeIds = new Set();
 
-
-
-// const ws = new WebSocket(`ws://${window.location.host}`);
-
-// ws.addEventListener('open', (event) => {
-//     console.log('WebSocket connection opened.');
-// });
-
-// ws.addEventListener('message', (event) => {
-//     // Handle incoming messages (live updates) from the server
-//     const message = JSON.parse(event.data);
-
-//     // Example: Update the target user's label
-//     currentUser.label = message.label;
-
-//     // Update your UI or perform other actions based on the incoming message
-// });
+let ws = new WebSocket(`ws://${window.location.host}`);
+ws.addEventListener('open', (event) => {
+    console.log('WebSocket connection opened.');
+});
 
 async function main() {
     const info = await getUserInfo(); 
     const displayName = info.displayName;
     
     const currentUser = {
-        id: "current",
+        id: `${username}`,
         label: `${displayName}`,
-        // label: "",
         color: getRandomColor()
     };
     
@@ -56,30 +43,230 @@ async function main() {
         radarView.addView(currentUser.id, currentUser.label, currentUser.color, initialRowsForTarget, 0);
     }, 0);
 
-    // target session
-    targetSession.getDocument().on("change", function(e) {
+    ws.addEventListener('close', (event) => {
+        console.log('WebSocket closed. Reconnecting...');
+        setTimeout(() => { ws = new WebSocket(`ws://${window.location.host}`); });
+    });
+    
+    function debounce(func, delay) {
+        let timeout;
+        return function () {
+            const context = this;
+            const args = arguments;
+            clearTimeout(timeout);
+            timeout = setTimeout(() => func.apply(context, args), delay);
+        };
+    }
+
+    const debouncedEditorSend = debounce(() => {
         const editorContents = targetSession.getValue();
-    });
-    
-    targetSession.on("changeScrollTop", function (scrollTop) {
-        setTimeout(function () {
-        const viewportIndicesForTarget = AceCollabExt.AceViewportUtil.getVisibleIndexRange(targetEditor);
-        const rowsForTarget = AceCollabExt.AceViewportUtil.indicesToRows(targetEditor, viewportIndicesForTarget.start, viewportIndicesForTarget.end);
-        radarView.setViewRows(currentUser.id, rowsForTarget);
-        }, 0);
-    });
-    
-    targetSession.selection.on('changeCursor', function(e) {
+        const message = {
+            type: 'editor-update', 
+            id: currentUser.id,
+            content: editorContents
+        };
+        console.log(`Editor contents sent from @${username}!`);
+        ws.send(JSON.stringify(message));
+    }, 0);
+
+    const debouncedCursorSend = debounce(() => {
         const cursorForTarget = targetEditor.getCursorPosition();
+
+        const rangesJson = AceCollabExt.AceRangeUtil.toJson(targetEditor.selection.getAllRanges());
+        const ranges = AceCollabExt.AceRangeUtil.fromJson(rangesJson);
+        
+        const viewportIndices = AceCollabExt.AceViewportUtil.getVisibleIndexRange(targetEditor);
+        const rows = AceCollabExt.AceViewportUtil.indicesToRows(targetEditor, viewportIndices.start, viewportIndices.end);
+
+        const message = {
+            type: 'cursor-update',
+            id: currentUser.id,
+            cursorPosition: cursorForTarget,
+            cursorLabel: currentUser.label,
+            cursorColor: currentUser.color,
+            rows: rows,
+            ranges: ranges
+        };
+        console.log(`Cursor Information sent from @${username}: ${JSON.stringify(message)}.`);
+        ws.send(JSON.stringify(message));
+    }, 0);
+
+    const debouncedScrollbarSend = debounce(() => {
+        const cursorForTarget = targetEditor.getCursorPosition();
+        const viewportIndices = AceCollabExt.AceViewportUtil.getVisibleIndexRange(targetEditor);
+        const rows = AceCollabExt.AceViewportUtil.indicesToRows(targetEditor, viewportIndices.start, viewportIndices.end);
+        
+        const message = {
+            type: 'scrollbar-update',
+            id: currentUser.id,
+            cursorPosition: cursorForTarget,
+            cursorLabel: currentUser.label,
+            cursorColor: currentUser.color,
+            rows: rows
+        };
+
+        console.log(`Scrollbar Information sent: ${JSON.stringify(message)}.`)
+        ws.send(JSON.stringify(message));
+    }, 0);
+
+    const debouncedSelectionSend = debounce(() => {
+        const cursorForTarget = targetEditor.getCursorPosition();
+        
+        const rangesJson = AceCollabExt.AceRangeUtil.toJson(targetEditor.selection.getAllRanges());
+        const ranges = AceCollabExt.AceRangeUtil.fromJson(rangesJson);
+        
+        const viewportIndices = AceCollabExt.AceViewportUtil.getVisibleIndexRange(targetEditor);
+        const rows = AceCollabExt.AceViewportUtil.indicesToRows(targetEditor, viewportIndices.start, viewportIndices.end);
+        
+        const message = {
+            type: 'selection-update',
+            id: currentUser.id,
+            cursorPosition: cursorForTarget,
+            cursorLabel: currentUser.label,
+            cursorColor: currentUser.color,
+            rows: rows,
+            ranges: ranges
+        };
+
+        console.log(`Selection Information sent from @${username}: ${JSON.stringify(message)}.`)
+        ws.send(JSON.stringify(message));
+    }, 0);
+    
+    targetSession.getDocument().on("change", function(e) {
+        if (ws.readyState === WebSocket.OPEN) {
+            debouncedEditorSend();
+            
+        } else {
+            console.error('WebSocket is not in OPEN state.');
+        }
+        
+    });
+
+    targetSession.selection.on('changeCursor', function (e) {
+        const cursorForTarget = targetEditor.getCursorPosition();
+        console.log(currentUser, cursorForTarget);
         targetCursorManagerForTarget.setCursor(currentUser.id, cursorForTarget);
         radarView.setCursorRow(currentUser.id, cursorForTarget.row);
-    }); //
-    
+        console.log("pieee 3");
+        console.log(e);
+
+        if (ws.readyState === WebSocket.OPEN) {
+            console.log("lakes");
+            debouncedCursorSend();
+        } else {
+            console.error('WebSocket is not in OPEN state.');
+        }
+    });
+
+    targetSession.on("changeScrollTop", function (scrollTop) {
+        setTimeout(function () {
+            const viewportIndicesForTarget = AceCollabExt.AceViewportUtil.getVisibleIndexRange(targetEditor);
+            const rowsForTarget = AceCollabExt.AceViewportUtil.indicesToRows(targetEditor, viewportIndicesForTarget.start, viewportIndicesForTarget.end);
+            radarView.setViewRows(currentUser.id, rowsForTarget);
+            console.log("pieee 2");
+        }, 0);
+
+        if (ws.readyState === WebSocket.OPEN) {
+            debouncedScrollbarSend();
+        } else {
+            console.error('WebSocket is not in OPEN state.');
+        }
+    });
+
     targetSession.selection.on('changeSelection', function(e) {
         const rangesJsonForTarget = AceCollabExt.AceRangeUtil.toJson(targetEditor.selection.getAllRanges());
         const rangesForTarget = AceCollabExt.AceRangeUtil.fromJson(rangesJsonForTarget);
         targetSelectionManagerForTarget.setSelection(currentUser.id, rangesForTarget);
+        
+        if (ws.readyState === WebSocket.OPEN) {
+            debouncedSelectionSend();
+        } else {
+            console.error('WebSocket is not in OPEN state.');
+        }
     }); 
+
+    ws.addEventListener('message', (event) => {
+        const receivedMessage = JSON.parse(event.data);
+
+        switch (receivedMessage.type) {
+            case 'editor-update':
+                if (receivedMessage.id !== currentUser.id) {
+                    if (receivedMessage.content !== targetSession.getValue()) {
+                        console.log(`Editor contents sent from @${receivedMessage.id}!`);
+                        targetSession.setValue(receivedMessage.content);
+                        console.log(currentUser);
+                        targetCursorManagerForTarget.setCursor(currentUser.id, receivedMessage.cursorPosition);
+                        console.log(targetEditor.getCursorPosition());
+                    }
+                    break;
+                }
+            case 'cursor-update':
+                console.log('Received cursor-update:', receivedMessage.id, receivedMessage.cursorPosition, receivedMessage.cursorLabel, receivedMessage.cursorColor);
+                if (!activeIds.has(receivedMessage.id)) {
+                    console.log('Setting cursor:', receivedMessage.id, receivedMessage.cursorPosition, receivedMessage.cursorLabel, receivedMessage.cursorColor);
+                    activeIds.add(receivedMessage.id);
+
+                    const ranges = AceCollabExt.AceRangeUtil.jsonToRanges(receivedMessage.ranges);
+                    
+                    targetCursorManagerForTarget.addCursor(receivedMessage.id, receivedMessage.cursorLabel, receivedMessage.cursorColor, 0);
+                    targetCursorManagerForTarget.setCursor(receivedMessage.id, receivedMessage.cursorPosition);
+                    targetSelectionManagerForTarget.addSelection(receivedMessage.id, receivedMessage.cursorLabel, receivedMessage.cursorColor, ranges);
+
+                    radarView.addView(receivedMessage.id, receivedMessage.cursorLabel, receivedMessage.cursorColor, receivedMessage.cursorPosition, receivedMessage.cursorPosition.row);
+                    radarView.setViewRows(receivedMessage.id, receivedMessage.rows);
+                } else {
+                    console.log('Updating cursor row:', receivedMessage.id, receivedMessage.cursorPosition.row);
+                    
+                    const ranges = AceCollabExt.AceRangeUtil.jsonToRanges(receivedMessage.ranges);
+                    
+                    targetCursorManagerForTarget.setCursor(receivedMessage.id, receivedMessage.cursorPosition);
+                    targetSelectionManagerForTarget.setSelection(receivedMessage.id, ranges);
+
+                    radarView.setCursorRow(receivedMessage.id, receivedMessage.cursorPosition.row);
+                }
+                break;
+            case 'scrollbar-update':
+                if (receivedMessage.id !== currentUser.id) {
+                    if (!activeIds.has(receivedMessage.id)) {
+                        console.log('Setting cursor:', receivedMessage.id, receivedMessage.cursorPosition, receivedMessage.cursorLabel, receivedMessage.cursorColor);
+                        activeIds.add(receivedMessage.id);
+
+                        radarView.addView(receivedMessage.id, receivedMessage.cursorLabel, receivedMessage.cursorColor, receivedMessage.cursorPosition, receivedMessage.cursorPosition.row);
+                        radarView.setViewRows(receivedMessage.id, receivedMessage.rows);
+                    } else {
+                        console.log('Updating scrollbar:', receivedMessage.id, receivedMessage.cursorPosition.row);
+                        
+                        radarView.setViewRows(receivedMessage.id, receivedMessage.rows);
+                    }
+                    break;
+                }
+            case 'selection-update':
+                if (!activeIds.has(receivedMessage.id)) {
+                    console.log('Setting cursor:', receivedMessage.id, receivedMessage.cursorPosition, receivedMessage.cursorLabel, receivedMessage.cursorColor);
+                    activeIds.add(receivedMessage.id);
+
+                    const ranges = AceCollabExt.AceRangeUtil.jsonToRanges(receivedMessage.ranges);
+                    
+                    targetCursorManagerForTarget.addCursor(receivedMessage.id, receivedMessage.cursorPosition);
+                    targetSelectionManagerForTarget.addSelection(receivedMessage.id, receivedMessage.cursorLabel, receivedMessage.cursorColor, ranges);
+
+                    radarView.addView(receivedMessage.id, receivedMessage.cursorLabel, receivedMessage.cursorColor, receivedMessage.cursorPosition, receivedMessage.cursorPosition.row);
+                    radarView.setViewRows(receivedMessage.id, receivedMessage.rows);
+                } else {
+                    console.log('Updating selection:', receivedMessage.id, receivedMessage.cursorPosition.row);
+                
+                    const ranges = AceCollabExt.AceRangeUtil.jsonToRanges(receivedMessage.ranges);
+
+                    targetSelectionManagerForTarget.setSelection(receivedMessage.id, ranges);
+
+                    radarView.setViewRows(receivedMessage.id, receivedMessage.rows);
+                    
+                    radarView.setCursorRow(receivedMessage.id, receivedMessage.cursorPosition.row);
+                    
+                }
+                break;
+            }
+    });
     
     async function fetchEditorContents() {
         try {
@@ -239,6 +426,5 @@ function getUserInfo() {
             console.log(error);
         });
 }
-
 
 inviteUserButton.addEventListener('click', inviteUser);
