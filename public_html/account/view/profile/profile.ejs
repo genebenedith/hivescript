@@ -6,15 +6,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="/public_html/img/hivescript_new_logo.png">
     <link id="cssFile" rel="stylesheet" type="text/css" href="/public_html/account/view/profile/profile.css">
+    <link href='https://fonts.googleapis.com/css?family=Montserrat' rel='stylesheet'>
     <!--Adding Bootstrap Part 1-->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css" rel="stylesheet">
     <link rel='stylesheet' href='https://netdna.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css'>
-    <script src='https://netdna.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js'></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/material-design-iconic-font/2.2.0/css/material-design-iconic-font.min.css">
     <!-- part 2 -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     <title>My Profile</title>
 </head>
 <body>
@@ -22,9 +20,8 @@
         <div class="row">
             <div class="profile-nav col-md-3">
                 <div class="user-heading round">
-                    <a href="#">
-                        <img src="https://avatars.dicebear.com/api/adventurer-neutral/mail%40ashallendesign.co.uk.svg">
-                    </a>
+                    <div user-initials="<%= user.firstName[0] %><%= user.lastName[0] %>"></div>
+
                     <h1><b><%= user.firstName %> <%= user.lastName %></b></h1>
                     <p><i>@<%= user.username %></i></p>
                     <p>Member Since <%= user.dateJoined %></p>
@@ -38,7 +35,9 @@
             </div>
             <div class="panel">
                 <div class="profile-graph-heading">
-                    Your HiveScript Profile
+                    <div id="logo">
+                        <img src="/public_html/img/hivescript_new_logo.png" alt="logo">
+                    </div>
                 </div>
                 <div class="panel-body profile-content" id="profile-tab" data-initial-tab="<%= tab === 'profile' ? 'active' : '' %>">
                     <!-- Profile Content -->
@@ -108,7 +107,50 @@
                 <div class="panel-body profile-content" id="edit-tab" style="display: none;" data-initial-tab="<%= tab === 'edit' ? 'active' : '' %>">
                     <!-- Edit Profile Content -->
                     <h1>Edit Profile</h1>
-                    <p>Edit profile content goes here.</p>
+                    <div class="col-lg-8">
+                        <div class="card edit-profile">
+                            <div class="card-body">
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h5 class="mb-0">First Name</h5>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="text" class="form-control" value="example"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h5 class="mb-0">Last Name</h5>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="text" class="form-control" value="example"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h5 class="mb-0">Username</h5>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="text" class="form-control" value="example"/>
+                                    </div>
+                                </div>
+                                <div class="row mb-3">
+                                    <div class="col-sm-3">
+                                        <h5 class="mb-0">Display Name</h5>
+                                    </div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="text" class="form-control" value="example"/>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-sm-3"></div>
+                                    <div class="col-sm-9 text-secondary">
+                                        <input type="button" class="btn btn-primary px-4" value="Save Changes"/>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
