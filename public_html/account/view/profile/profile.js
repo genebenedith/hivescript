@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Check for the tab from document data set
     const tab = getTabFromDataset();
-    showTab(tab)
+    showTab(tab);
 });
 
 function getTabFromDataset() {

@@ -1,5 +1,9 @@
 {
   "dependencies": {
+    "@fontsource/roboto": "^5.0.8",
+    "@mui/icons-material": "^5.14.19",
+    "@mui/material": "^5.14.20",
+    "@mui/styled-engine-sc": "^6.0.0-alpha.7",
     "codemirror": "^5.65.16",
     "cookie-parser": "^1.4.6",
     "crypto": "^1.0.1",
@@ -7,6 +11,9 @@
     "express": "^4.18.2",
     "http": "^0.0.1-security",
     "mongoose": "^8.0.1",
+    "react": "^18.2.0",
+    "react-dom": "^18.2.0",
+    "styled-components": "^6.1.1",
     "uuid": "^9.0.1",
     "ws": "^8.14.2",
     "y-codemirror": "^3.0.1",
@@ -16,5 +23,18 @@
   },
   "devDependencies": {
     "@convergencelabs/ace-collab-ext": "^0.6.0"
+  },
+  "name": "material-ui-avatar-example-with-styled-components",
+  "version": "3.0.0",
+  "description": "",
+  "keywords": [],
+  "homepage": "https://codesandbox.io/s/4j7m47vlm4",
+  "main": "index.js",
+  "dependencies": {
+    "@material-ui/core": "latest",
+    "@material-ui/lab": "4.0.0-alpha.57",
+    "react": "latest",
+    "react-dom": "latest",
+    "styled-components": "5.2.1"
   }
 }
