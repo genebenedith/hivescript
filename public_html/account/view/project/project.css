@@ -83,29 +83,6 @@ body{
   margin-left:0px;
   padding-left:0px;
 }
-
-/*
-.ace_scrollbar::-webkit-scrollbar {
-  height: 7px;
-  width: 7px;
-}
-
-.ace_scrollbar::-webkit-scrollbar-track
-{
-  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
-  background-color: #272822; 
-  border-radius: 10px;
-}
-
-.ace_scrollbar::-webkit-scrollbar-thumb {
-  background-color: darkgrey;
-  outline: 1px solid slategrey;
-  border-radius: 10px;
-}
-
-*/
-
-
   
 #inviteButton{
   background-color: #ffcc00;
