@@ -35,9 +35,6 @@ async function main() {
 
 
     setTimeout(function() {
-        radarView.addView("fake1", "fake1",  "RoyalBlue", {start: 60, end: 75}, 50);
-        radarView.addView("fake2", "fake2",  "lightgreen", {start: 10, end: 50}, 30);
-
         const initialIndicesForTarget = AceCollabExt.AceViewportUtil.getVisibleIndexRange(targetEditor);
         const initialRowsForTarget = AceCollabExt.AceViewportUtil.indicesToRows(targetEditor, initialIndicesForTarget.start, initialIndicesForTarget.end);
         radarView.addView(currentUser.id, currentUser.label, currentUser.color, initialRowsForTarget, 0);
@@ -45,8 +42,17 @@ async function main() {
 
     ws.addEventListener('close', (event) => {
         console.log('WebSocket closed. Reconnecting...');
-        setTimeout(() => { ws = new WebSocket(`ws://${window.location.host}`); });
+        setTimeout(() => {
+            ws.close();
+            ws = new WebSocket(`ws://${window.location.host}`);
+        }, 1000);
     });
+
+    ws.addEventListener('error', (event) => {
+        console.error('WebSocket error:', event);
+        // Handle the error as needed
+    });
+    
     
     function debounce(func, delay) {
         let timeout;
@@ -287,7 +293,7 @@ async function main() {
     function saveEditorContents(editorContents) {
         let save = fetch(`/project/${projectId}/save-contents`, {
             method: 'POST',
-            body: JSON.stringify({ editorContents }),
+            body: JSON.stringify({ editorContents: editorContents, inviter: username }),
             headers: {"Content-Type": "application/json"}
         });
 
@@ -327,7 +333,8 @@ async function main() {
     function updateEditorTheme(theme) {
         console.log("change theme");
         targetEditor.setTheme(theme);
-    }
+    };
+    
     
     document.getElementById('save-button').addEventListener('click', async () => {
         await saveEditorContents(targetSession.getValue());
