@@ -1,10 +1,13 @@
+// Final Project: HiveScript Collaborative Code Editor
+// Course: CSC 337 - Web Programming (Fall 2023)
+// Team Members: 
+// - Genesis Benedith
+// - Shri Varshini Karthikeyan
+// - Shannon Puno
+// - Julia Ryan
+
 const loginButton = document.getElementById("loginButton");
 const createAccountButton = document.getElementById("createAccountButton");
-
-/* 
-* Defines object for user with HTML input values 
-* and send user data to server
-*/
 
 var createAccount_setting = false;
 var login_setting = true;
