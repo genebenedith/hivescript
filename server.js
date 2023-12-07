@@ -10,7 +10,7 @@ const WebSocket = require('ws');
 const http = require('http');
 
 const port = 80; 
-const hostname = 'localhost'; // For now 
+const hostname = 'http://143.198.152.183/'; 
 
 const app = express();
 const server = http.createServer(app);
@@ -777,6 +777,8 @@ app.post('/project/:projectId/delete', async (req, res) => {
 app.post('/project/:projectId/save-contents', async (req, res) => {
     const projectId = req.params.projectId;
     const editorContents = req.body.editorContents;
+    const inviterUsername = req.body.inviter;
+
 
     try {
         const project = await Project.findOne({ projectId }).exec();
@@ -791,6 +793,37 @@ app.post('/project/:projectId/save-contents', async (req, res) => {
         project.editorContents = editorContents;
         const savedProject = await project.save();
 
+        // Get the inviter user
+        const inviterUser = await User.findOne({ username: inviterUsername }).exec();
+
+        if (!inviterUser) {
+            console.log("Inviter user not found.");
+            res.status(404).send("Inviter user not found.");
+            return;
+        }
+
+        // Customize the notification message
+        const message = `${inviterUser.firstName} ${inviterUser.lastName} (@${inviterUser.username}) has updated a shared project!`;
+
+        // Iterate through workingBees and send notifications
+        for (const inviteeUsername of project.workingBees) {
+            // Get the invitee user
+            const inviteeUser = await User.findOne({ username: inviteeUsername }).exec();
+
+            if (inviteeUser) {
+                // Create a notification for the invitee
+                const notification = await createDocumentNotification(inviteeUsername, inviterUsername, 'New document update! 🎉', projectId, message);
+                console.log('hi');
+                // Add the notification ID to the invitee's notifications array
+                inviteeUser.notifications.push(notification);
+                await inviteeUser.save();
+            } else {
+                console.log(`User with username ${inviteeUsername} not found.`);
+            }
+        }
+
+        console.log("User invited successfully.");
+
         console.log("Editor contents saved successfully.");
         res.status(200).send("Editor contents saved successfully.");
     } catch (error) {
@@ -801,12 +834,14 @@ app.post('/project/:projectId/save-contents', async (req, res) => {
 });
 
 // Create a notification that lets user know there's a new saved version of the editor
-async function createNotification(receiver, sender, type, message) {
+async function createDocumentNotification(receiver, sender, title, projectID, message) {
     try {
         const notification = new Notification({
             receiver: receiver,
             sender: sender,
-            type: type,
+            title: title,
+            type: 'Document',
+            projectID: projectID,
             message: message,
         });
 
@@ -893,6 +928,36 @@ app.post('/project/:projectId/invite-user', async (req, res) => {
     } catch (error) {
         console.error("Error inviting user:", error);
         res.status(500).send("Error inviting user.");
+    }
+});
+
+// Handle request to update user profile information
+app.post('/profile/:username/update', async (req, res) => {
+    const updatedUserInfo = req.body.updatedUserInfo;
+    console.log(updatedUserInfo.username);
+
+    try {
+        const user = await User.findOne({ username: updatedUserInfo.username }).exec();
+
+        if (!user) {
+            console.log("User not found.");
+            res.status(404).send("User not found.");
+            return;
+        }
+
+        // Update the user information in the user document
+        user.firstName = updatedUserInfo.firstName;
+        user.lastName = updatedUserInfo.lastName;
+        user.displayName = updatedUserInfo.displayName;
+
+        const savedUser = await user.save();
+
+        console.log("Profile updated successfully.");
+        res.status(200).send("Profile updated successfully.");
+    } catch (error) {
+        console.log("Issue updating profile.");
+        console.error(error);
+        res.status(500).send("Issue updating profile.");
     }
 });
 
