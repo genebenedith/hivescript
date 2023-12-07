@@ -122,7 +122,7 @@ function goToCreateAccount(event){
 
     //////// now replace he components of the right-most div; the "creat user" side.
     document.getElementById("createTitle").innerHTML = "Create Account";
-    document.getElementById("create-form").innerHTML = '<input type="text" id="firstName" class="indexTextInput-create" name="firstName" placeholder="First Name"><input type="text" id="lastName" class="indexTextInput-create" name="lastName" placeholder="Last Name"><input type="text" id="newUsername" class="indexTextInput-create" name="username" placeholder="New username"><input type="text" id="newPassword" class="indexTextInput-create" name="password" placeholder="New password">'; // <input type="submit" class="indexPageButton-SUBMIT" id="createAccount_SUMBIT" value="Create Account" onClick={createUser}></input>
+    document.getElementById("create-form").innerHTML = '<input type="text" id="firstName" class="indexTextInput-create" name="firstName" placeholder="First Name" required /><input type="text" id="lastName" class="indexTextInput-create" name="lastName" placeholder="Last Name" required /><input type="text" id="newUsername" class="indexTextInput-create" name="username" placeholder="New username" required /><input type="text" id="newPassword" class="indexTextInput-create" name="password" placeholder="New password" required />';
     document.getElementById("create-imgContain").innerHTML = "";
     document.getElementById("create-switchText1").innerHTML = "";
     document.getElementById("create-switchText2").innerHTML = "";
@@ -138,7 +138,7 @@ function goToLogin(event){
 
 
     document.getElementById("title").innerHTML = "<br></br>Login";
-    document.getElementById("login-form").innerHTML = '<input type="text" id="username" class="indexTextInput" name="username" placeholder="Username"><input type="text" id="password" class="indexTextInput" name="password" placeholder="Password">';
+    document.getElementById("login-form").innerHTML = '<input type="text" id="username" class="indexTextInput" name="username" placeholder="Username" required /><input type="text" id="password" class="indexTextInput" name="password" placeholder="Password" required />';
     document.getElementById("login-imgContain").innerHTML='';
     document.getElementById("login-switchText1").innerHTML = '';
     document.getElementById("login-switchText2").innerHTML = '';
