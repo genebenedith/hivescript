@@ -343,6 +343,13 @@ app.get('/node_modules/ace-builds/src-min/mode-javascript.js', (req, res) => {
     res.sendFile(__dirname + '/node_modules/ace-builds/src-min/mode-javascript.js');
 });
 
+app.get('/node_modules/ace-builds/src-min/mode-java.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/mode-java.js');
+});
+app.get('/node_modules/ace-builds/src-min/mode-python.js', (req, res) => {
+    res.sendFile(__dirname + '/node_modules/ace-builds/src-min/mode-python.js');
+});
+
 app.get('/public_html/account/view/project/editor_contents.js', (req, res) => {
     res.sendFile(__dirname + '/public_html/account/view/project/editor_contents.js');
 });
