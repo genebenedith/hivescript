@@ -1,7 +1,8 @@
+
 body{
     color: rgb(249, 249, 249);
     background: #f1f2f7;
-    font-family: 'Montserrat', sans-serif;
+    font-family: 'Montserrat';
     padding: 0px !important;
     margin: 0px !important;
     font-size: 13px;
@@ -30,6 +31,11 @@ body{
 
 .profile-nav{
     margin-top:30px;
+    font-family: 'Montserrat';
+}
+
+h1 {
+    font-family: 'Montserrat';
 }
 
 .profile-nav .user-heading {
@@ -39,6 +45,7 @@ body{
     -webkit-border-radius: 4px 4px 0 0;
     padding: 30px;
     text-align: center;
+    font-family: 'Montserrat';
 }
 
 .profile-nav .user-heading a img {
@@ -107,6 +114,7 @@ body{
     box-shadow: none;
     color: #c3c3c3;
     font-size: 16px;
+    font-family: 'Montserrat';
 }
 
 .profile-graph-heading {
@@ -119,6 +127,7 @@ body{
     -webkit-border-radius: 4px 4px 0 0;
     font-size: 16px;
     font-weight: 300;
+    font-family: 'Montserrat';
 }
 
 .bio-graph-info {
@@ -285,10 +294,7 @@ body{
 
 .inbox .mail_list .list-group-item .msg {
     margin-bottom: 0px
-    
-    
 }
-
 
 .inbox .mail_list .unread .media-heading a {
     color: #333;
@@ -311,7 +317,7 @@ body{
 
 #trash-button {
     position: absolute;
-    top: 217px; 
+    top: 246px; 
     right: 820px; 
     z-index: 1;
     padding: 10px 20px;
@@ -324,7 +330,7 @@ body{
 }
 #trash-button:hover {
     position: absolute;
-    top: 217px; 
+    top: 246px; 
     right: 820px; 
     z-index: 1;
     padding: 10px 20px;
@@ -335,7 +341,7 @@ body{
     cursor: pointer;
     font-size: 20px;
 }
-  
+
 #edit-profile {
     position: relative;
     display: flex;
@@ -348,13 +354,41 @@ body{
     border-radius: .25rem;
     margin-bottom: 1.5rem;
     box-shadow: 0 2px 6px 0 rgb(218 218 253 / 65%), 0 2px 6px 0 rgb(206 206 238 / 54%);
+    font-family: 'Montserrat';
+}
+
+h5 {
+    font-family: 'Montserrat';
 }
 
 img {
     margin-top: -60px;  /* LOGO IS NOT WELL-CROPPED; MUST ADJUST MARGIN TO COMPENSATE */
-    margin-bottom: -10px;
+    margin-bottom: -60px;
     margin-left: -13;
     min-height: 200px;
     height: 20vh;
-    margin:0 auto;
+    display: inline-block;
 }
+
+#save-button{
+    background-color: #ffcc00;
+    color:black;
+    border: 1px solid white;
+    border-radius: 5px;
+    font-family: 'Montserrat';
+    width:40%;
+    padding-top:10px;
+    padding-bottom: 10px;
+  }
+  
+  #save-button:hover{
+    background-color: #ffeea8;
+    border: 1px solid black;
+    font-size:15px;
+    padding-top: 9px;
+    padding-bottom: 9px;
+  }
+  
+  .mb-0 {
+    font-family: 'Montserrat';
+  }
