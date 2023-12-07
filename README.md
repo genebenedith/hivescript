@@ -30,4 +30,4 @@ node server.js
 ```
 
 ## Authors
-Genesis Benedict, Shannon Puno, Julia Ryan, Shri Varshini Karthikeyan,
+Genesis Benedith, Shannon Puno, Julia Ryan, Shri Varshini Karthikeyan,
