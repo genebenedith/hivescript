@@ -81,3 +81,35 @@ function readNotifications(username) {
         console.error('Error marking notifications as read:', error);
     }
 };
+
+// Handle changes to user account 
+function saveChanges(user) {
+    // Get values from input fields
+    var firstName = document.getElementById("first-name-input").value;
+    var lastName = document.getElementById("last-name-input").value;
+    var username = document.getElementById("username-input").value;
+    var displayName = document.getElementById("display-name-input").value;
+
+    // Create an object with the updated user information
+    var updatedUserInfo = {
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
+        displayName: displayName
+    };
+
+    try {
+        fetch(`/profile/${user}/update`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ updatedUserInfo }),
+        });
+        console.log('Profile information updated.');
+    } catch (error) {
+        console.error('Error updating user profile:', error);
+    }
+};
+
+
