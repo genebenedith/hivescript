@@ -41,25 +41,25 @@
                 </div>
                 <div class="panel-body profile-content" id="profile-tab" data-initial-tab="<%= tab === 'profile' ? 'active' : '' %>">
                     <!-- Profile Content -->
-                    <h1>Profile</h1>
+                    <h1 style="font-family: Montserrat;">Profile</h1>
                     <div class="row">
                         <div class="bio-row">
-                            <p><span>First Name </span>: <%= user.firstName %></p>
+                            <p><span style="font-family: Montserrat;">First Name </span>: <%= user.firstName %></p>
                         </div>
                         <div class="bio-row">
-                            <p><span>Last Name </span>: <%= user.lastName %></p>
+                            <p><span style="font-family: Montserrat;">Last Name </span>: <%= user.lastName %></p>
                         </div>
                         <div class="bio-row">
-                            <p><span>Username </span>: <%= user.username %></p>
+                            <p><span style="font-family: Montserrat;">Username </span>: <%= user.username %></p>
                         </div>
                         <div class="bio-row">
-                            <p><span>Display Name </span>: <%= user.displayName %></p>
+                            <p><span style="font-family: Montserrat;">Display Name </span>: <%= user.displayName %></p>
                         </div>
                     </div>
                 </div>
                 <div class="panel-body profile-content" id="notifications-tab" style="display: none;" data-initial-tab="<%= tab === 'notifications' ? 'active' : '' %>">
                     <!-- Notifications Content -->
-                    <h1>Notifications</h1>
+                    <h1 style="font-family: Montserrat;">Notifications</h1>
                     
                     <i class="fa fa-trash-o" id="trash-button" onclick="deleteNotifications('<%= user.username %>')"></i>
                     <section class="content inbox">
@@ -106,7 +106,7 @@
                 </div>
                 <div class="panel-body profile-content" id="edit-tab" style="display: none;" data-initial-tab="<%= tab === 'edit' ? 'active' : '' %>">
                     <!-- Edit Profile Content -->
-                    <h1>Edit Profile</h1>
+                    <h1 style="font-family: Montserrat;">Edit Profile</h1>
                     <div class="col-lg-8">
                         <div class="card edit-profile">
                             <div class="card-body">
@@ -115,7 +115,7 @@
                                         <h5 class="mb-0">First Name</h5>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        <input type="text" class="form-control" value="example"/>
+                                        <input type="text" id="first-name-input" class="form-control" value="<%= user.firstName %>"/>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -123,7 +123,7 @@
                                         <h5 class="mb-0">Last Name</h5>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        <input type="text" class="form-control" value="example"/>
+                                        <input type="text" id="last-name-input" class="form-control" value="<%= user.lastName %>"/>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -131,7 +131,7 @@
                                         <h5 class="mb-0">Username</h5>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        <input type="text" class="form-control" value="example"/>
+                                        <input type="text" id="username-input" class="form-control" value="<%= user.username %>"/>
                                     </div>
                                 </div>
                                 <div class="row mb-3">
@@ -139,13 +139,13 @@
                                         <h5 class="mb-0">Display Name</h5>
                                     </div>
                                     <div class="col-sm-9 text-secondary">
-                                        <input type="text" class="form-control" value="example"/>
+                                        <input type="text" id="display-name-input" class="form-control" value="<%= user.displayName %>"/>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-3"></div>
                                     <div class="col-sm-9 text-secondary">
-                                        <input type="button" id="save-button" class="btn btn-primary px-4" value="Save Changes"/>
+                                        <input type="button" id="save-button" class="btn btn-primary px-4" onclick="saveChanges('<%= user.username %>')" value="Save Changes"/>
                                     </div>
                                 </div>
                             </div>
